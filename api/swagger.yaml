@@ -1,0 +1,306 @@
+openapi: "3.0.0"
+info:
+  title: "Device Management API"
+  version: "1.0.0"
+
+paths:
+  /devices/list:
+    get:
+      summary: "List all devices"
+      description: "This endpoint will return a list of all devices"
+      responses:
+        '200':
+          description: "Successful response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DevicesResponse"
+        '204':
+          description: "No devices found"
+
+  /devices/reserve:
+    post:
+      summary: "Reserve a device"
+      description: "This endpoint will reserve a specified device for a specified user."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReserveDeviceRequest"
+      responses:
+        '200':
+          description: "Device successfully reserved"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '409':
+          description: "Device is already reserved by another user"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  reserved_by:
+                    type: string
+        '404':
+          description: "Specified device does not exist"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: "Bad Request: JSON body expected, or missing/empty device or username fields."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /devices/add:
+    post:
+      summary: "Add a new device"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddDeviceRequest"
+      responses:
+        '201':
+          description: "Device successfully added"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '409':
+          description: "Device with this name already exists"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: "Bad Request: JSON body expected, or missing/empty device or model fields."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /devices/release:
+    post:
+      summary: "Release a device"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReleaseDeviceRequest"
+      responses:
+        '200':
+          description: "Device successfully released"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '304':
+          description: "Device is not reserved, thus not modified"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: "Specified device does not exist"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: "Bad Request: JSON body expected, or missing/empty device field."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /devices/offline:
+    post:
+      summary: "Sets a device to offline mode"
+      description: "This endpoint will set the status of a specified device to 'offline'."
+      requestBody:
+        description: "Device to set to offline"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetOfflineRequest'
+      responses:
+        "200":
+          description: "Successfully set the device to offline"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "304":
+          description: "Device is already offline"
+        "404":
+          description: "Specified device does not exist"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "400":
+          description: "JSON body expected, or missing/empty device field"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /devices/online:
+    post:
+      summary: "Sets a device to online (or available) mode"
+      description: "This endpoint will set the status of a specified device to 'free' or 'online'."
+      requestBody:
+        description: "Device to set to online"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetOnlineRequest'
+      responses:
+        "200":
+          description: "Successfully set the device to online"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "304":
+          description: "Device is already online"
+        "404":
+          description: "Specified device does not exist"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "400":
+          description: "JSON body expected, or missing/empty device field"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /devices/delete/:
+    delete:
+      summary: "Wrong attempt to delete a device"
+      description: "Attempt to delete a device without specifying the device name."
+      responses:
+        "400":
+          description: "Bad request, device name missing."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+
+  /devices/delete/{device_name}:
+    delete:
+      summary: "Deletes a device from the system"
+      description: "This endpoint will remove a specified device from the system database."
+      parameters:
+        - name: "device_name"
+          in: "path"
+          description: "The name of the device to be deleted"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successfully deleted the device"
+        "404":
+          description: "Specified device does not exist"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "400":
+          description: "Bad Request: Invalid device_id format or missing/empty device_id."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+components:
+  schemas:
+    Message:
+      type: "object"
+      properties:
+        message:
+          type: "string"
+    Device:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        name:
+          type: "string"
+        model:
+          type: "string"
+        status:
+          type: "string"
+          enum: ["free", "reserved", "offline"]
+        user:
+          type: "string"
+          
+    DevicesResponse:
+      type: "object"
+      properties:
+        devices:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Device"
+            
+    ReserveDeviceRequest:
+      type: "object"
+      properties:
+        device:
+          type: "string"
+        username:
+          type: "string"
+
+    AddDeviceRequest:
+      type: "object"
+      properties:
+        device:
+          type: "string"
+        model:
+          type: "string"
+
+    ReleaseDeviceRequest:
+      type: object
+      required:
+        - device
+      properties:
+        device:
+          type: string
+          description: "The name of the device to be released"
+
+    SetOfflineRequest:
+      type: object
+      required:
+        - device
+      properties:
+        device:
+          type: string
+          description: "The name of the device to set status for"
+
+    SetOnlineRequest:
+      type: object
+      required:
+         - device
+      properties:
+        device:
+          type: string
+          description: "The name of the device to set status for"
