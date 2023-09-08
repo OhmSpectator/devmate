@@ -4,7 +4,7 @@ import requests
 import sys
 
 DEVMATE_ADDRESS = os.environ.get('DEVMATE_ADDRESS', 'devmate.zededa.net')
-DEVMATE_PORT = os.environ.get('DEVMATE_PORT', '5000')
+DEVMATE_PORT = os.environ.get('DEVMATE_PORT', '8001')
 
 BASE_URL = f"http://{DEVMATE_ADDRESS}:{DEVMATE_PORT}"
 
