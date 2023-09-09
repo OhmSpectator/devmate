@@ -6,7 +6,7 @@ from http import HTTPStatus
 
 import requests
 
-import client.client as device_management
+import devmatecli.client as device_management
 
 
 class TestServerAccess(unittest.TestCase):
@@ -346,7 +346,7 @@ class TestHandleUnexpectedStatus(unittest.TestCase):
 class TestClient(unittest.TestCase):
 
     @patch('sys.exit')
-    @patch('client.client.check_server_accessibility')
+    @patch('devmatecli.client.check_server_accessibility')
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_server_not_accessible(self, mock_stdout, mock_check_server_accessibility, mock_exit):
         mock_check_server_accessibility.return_value = False
@@ -361,10 +361,10 @@ class TestClient(unittest.TestCase):
         self.assertEqual(mock_stdout.getvalue(),
                          "Server is not accessible. Please check your connection and try again.\n")
 
-    @patch('client.client.check_server_accessibility')
+    @patch('devmatecli.client.check_server_accessibility')
     @patch('sys.exit')
     @patch('sys.stdout', new_callable=io.StringIO)
-    @patch('client.client.argparse.ArgumentParser.parse_args')
+    @patch('devmatecli.client.argparse.ArgumentParser.parse_args')
     def test_no_command_provided(self, mock_parse_args, mock_stdout, mock_exit, mock_check_server_accessibility):
         mock_check_server_accessibility.return_value = True
         mock_parse_args.return_value = Mock(command=None)  # Simulate no command provided
@@ -376,16 +376,16 @@ class TestClient(unittest.TestCase):
 
 
 class TestClientCommands(unittest.TestCase):
-    @patch('client.client.check_server_accessibility')
-    @patch('client.client.list_devices')
+    @patch('devmatecli.client.check_server_accessibility')
+    @patch('devmatecli.client.list_devices')
     def test_list_command(self, mock_list_devices, mock_check_server_accessibility):
         mock_check_server_accessibility.return_value = True
         with patch.object(sys, 'argv', ['client.py', 'list']):
             device_management.main()  # Assuming your main part is in a function called main
         mock_list_devices.assert_called_once()
 
-    @patch('client.client.reserve_device')
-    @patch('client.client.check_server_accessibility')
+    @patch('devmatecli.client.reserve_device')
+    @patch('devmatecli.client.check_server_accessibility')
     def test_reserve_command(self, mock_check_server_accessibility, mock_reserve_device):
         mock_check_server_accessibility.return_value = True
         with patch.object(sys, 'argv', ['client.py', 'reserve', 'device1', '--user', 'user1']):
@@ -393,8 +393,8 @@ class TestClientCommands(unittest.TestCase):
         mock_reserve_device.assert_called_once_with('device1', 'user1')
 
     @patch('os.getlogin')
-    @patch('client.client.reserve_device')
-    @patch('client.client.check_server_accessibility')
+    @patch('devmatecli.client.reserve_device')
+    @patch('devmatecli.client.check_server_accessibility')
     def test_reserve_command_no_user(self, mock_check_server_accessibility, mock_reserve_device, mock_getlogin):
         mock_check_server_accessibility.return_value = True
         mock_getlogin.return_value = 'os_user'
@@ -402,40 +402,40 @@ class TestClientCommands(unittest.TestCase):
             device_management.main()
         mock_reserve_device.assert_called_once_with('device1', 'os_user')
 
-    @patch('client.client.release_device')
-    @patch('client.client.check_server_accessibility')
+    @patch('devmatecli.client.release_device')
+    @patch('devmatecli.client.check_server_accessibility')
     def test_release_command(self, mock_check_server_accessibility, mock_release_device):
         mock_check_server_accessibility.return_value = True
         with patch.object(sys, 'argv', ['client.py', 'release', 'device1']):
             device_management.main()
         mock_release_device.assert_called_once_with('device1')
 
-    @patch('client.client.add_device')
-    @patch('client.client.check_server_accessibility')
+    @patch('devmatecli.client.add_device')
+    @patch('devmatecli.client.check_server_accessibility')
     def test_add_command(self, mock_check_server_accessibility, mock_add_device):
         mock_check_server_accessibility.return_value = True
         with patch.object(sys, 'argv', ['client.py', 'add', 'device1', '--model', 'model1']):
             device_management.main()
         mock_add_device.assert_called_once_with('device1', 'model1')
         
-    @patch('client.client.delete_device')
-    @patch('client.client.check_server_accessibility')
+    @patch('devmatecli.client.delete_device')
+    @patch('devmatecli.client.check_server_accessibility')
     def test_delete_command(self, mock_check_server_accessibility, mock_delete_device):
         mock_check_server_accessibility.return_value = True
         with patch.object(sys, 'argv', ['client.py', 'delete', 'device1']):
             device_management.main()
         mock_delete_device.assert_called_once_with('device1')
 
-    @patch('client.client.set_device_offline')
-    @patch('client.client.check_server_accessibility')
+    @patch('devmatecli.client.set_device_offline')
+    @patch('devmatecli.client.check_server_accessibility')
     def test_offline_command(self, mock_check_server_accessibility, mock_set_device_offline):
         mock_check_server_accessibility.return_value = True
         with patch.object(sys, 'argv', ['client.py', 'offline', 'device1']):
             device_management.main()
         mock_set_device_offline.assert_called_once_with('device1')
 
-    @patch('client.client.set_device_online')
-    @patch('client.client.check_server_accessibility')
+    @patch('devmatecli.client.set_device_online')
+    @patch('devmatecli.client.check_server_accessibility')
     def test_online_command(self, mock_check_server_accessibility, mock_set_device_online):
         mock_check_server_accessibility.return_value = True
         with patch.object(sys, 'argv', ['client.py', 'online', 'device1']):
