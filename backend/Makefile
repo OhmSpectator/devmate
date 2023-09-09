@@ -1,7 +1,7 @@
 IMAGE_NAME := devmate_backend
 CONTAINER_NAME := devmate_backend_instance
 
-.PHONY: run clean
+.PHONY: run clean tests
 
 # default target to run when executing `make`
 all: build run info
@@ -48,7 +48,9 @@ check-container:
 shell: check-container
 	@docker exec -it $(CONTAINER_NAME) /bin/bash
 
-test:
-	@pytest ./tests
+# run tests
+tests:
+	@python -m unittest discover -s ./tests -p 'test_*.py'
+
 
 

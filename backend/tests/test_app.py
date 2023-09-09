@@ -81,17 +81,18 @@ class TestAddDevice(BaseTestCase):
 
         response = self.app.post('/devices/add', json={'device': 'Device1', 'model': 'Model2'})
         self.assertEqual(HTTPStatus.CONFLICT, response.status_code)
-        self.assertEqual(response.json, {'error': 'Device with this name already exists'})
+        self.assertEqual(response.json, {'message': 'Device with this name already exists'})
 
     def test_add_device_missing_params(self):
         response = self.app.post('/devices/add', json={'device': 'Device1'})
         self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
-        self.assertEqual(response.json, {'error': 'Missing parameters: model'})
+        self.assertEqual(response.json, {'message': 'Missing parameters: model'})
 
     def test_add_device_empty_params(self):
         response = self.app.post('/devices/add', json={'device': '', 'model': ''})
         self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
-        self.assertEqual(response.json, {'error': 'Empty parameters: device, model'})
+        self.assertEqual(response.json, {'message': 'Empty parameters: '
+                                                    'device, model'})
 
 
 class TestReleaseDevice(BaseTestCase):
@@ -123,12 +124,12 @@ class TestReleaseDevice(BaseTestCase):
     def test_release_device_missing_parameters(self):
         response = self.client.post('/devices/release', json={})
         self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
-        self.assertEqual(response.get_json(), {'error': 'JSON body expected'})
+        self.assertEqual(response.get_json(), {'message': 'JSON body expected'})
 
     def test_release_device_empty_parameters(self):
         response = self.client.post('/devices/release', json={'device': ''})
         self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
-        self.assertEqual(response.get_json(), {'error': 'Empty parameters: device'})
+        self.assertEqual(response.get_json(), {'message': 'Empty parameters: device'})
 
 
 class TestReserveDevice(BaseTestCase):
@@ -163,12 +164,12 @@ class TestReserveDevice(BaseTestCase):
     def test_reserve_device_missing_parameters(self):
         response = self.client.post('/devices/reserve', json={})
         self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
-        self.assertEqual(response.get_json(), {'error': 'JSON body expected'})
+        self.assertEqual(response.get_json(), {'message': 'JSON body expected'})
 
     def test_reserve_device_empty_parameters(self):
         response = self.client.post('/devices/reserve', json={'device': '', 'username': ''})
         self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
-        self.assertEqual(response.get_json(), {'error': 'Empty parameters: device, username'})
+        self.assertEqual(response.get_json(), {'message': 'Empty parameters: device, username'})
 
 
 class TestSetDeviceStatus(BaseTestCase):
@@ -263,7 +264,7 @@ class TestValidation(unittest.TestCase):
         # Check the status code and the JSON response
         self.assertEqual(response.status_code, 400)
         expected_response = {
-            'error': 'Missing parameters: model, Empty parameters: device'
+            'message': 'Missing parameters: model, Empty parameters: device'
         }
         self.assertEqual(response.get_json(), expected_response)
 

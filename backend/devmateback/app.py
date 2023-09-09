@@ -28,7 +28,7 @@ def before_request():
 
 @app.after_request
 def after_request(response):
-    logger.debug(f'HANDLED: {response.status_code} - {response.status}')
+    logger.debug(f'HANDLED: {response.status}')
     return response
 
 
