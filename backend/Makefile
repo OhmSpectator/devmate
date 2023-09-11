@@ -18,7 +18,7 @@ build:
 	@docker build -t $(IMAGE_NAME) .
 
 # run the Docker container with port forwarding
-run: clean-instance
+run: clean-instance build
 	@docker run -d --name $(CONTAINER_NAME) -p 8001:8000 $(IMAGE_NAME)
 
 # print info on how to test the app

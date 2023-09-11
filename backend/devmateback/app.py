@@ -2,12 +2,13 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask, request
+from flask_cors import CORS
 
 from devmateback.models import db
 from devmateback.devices import devices_bp
 
 # Set up logging
-handler = RotatingFileHandler('devmate.log', maxBytes=1024*1024, backupCount=3)
+handler = RotatingFileHandler('devmate.log', maxBytes=1024 * 1024, backupCount=3)
 formatter = logging.Formatter('[%(asctime)s.%(msecs)03d] [%(name)s] [%(levelname)s] :  %(message)s',
                               datefmt='%d.%m.%Y %H:%M:%S')
 handler.setFormatter(formatter)
@@ -15,8 +16,8 @@ logger = logging.getLogger('devmate')
 logger.setLevel(logging.DEBUG)
 logger.addHandler(handler)
 
-
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///devices.db'
 
 
