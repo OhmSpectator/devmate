@@ -61,10 +61,24 @@ const App = () => {
   }
 };
 
-  // useEffect to handle initial fetch
   useEffect(() => {
-    fetchDevices();
-  }, []); // Run only once when the component mounts
+    let isMounted = true; // Flag to prevent state update on an unmounted component
+
+    const fetchDevicesRepeatedly = async () => {
+      while (isMounted) {
+        const newDevices = await fetchDevices();
+        if (newDevices && JSON.stringify(newDevices) !== JSON.stringify(devices)) {
+          setDevices(newDevices);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+      }
+    };
+
+    fetchDevicesRepeatedly();
+
+    return () => { isMounted = false }; // Cleanup function
+  }, []); // Empty dependency array
 
 
   useEffect(() => {
