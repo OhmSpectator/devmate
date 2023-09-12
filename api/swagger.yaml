@@ -256,7 +256,7 @@ components:
         reservation_time:
           type: "string"
           format: "date-time"
-          description: "The time when the device was reserved. Null if not reserved."
+          description: "The time when the device was reserved (UTC). Null if not reserved."
           
     DevicesResponse:
       type: "object"

@@ -1,6 +1,6 @@
 import logging
 
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify
 from http import HTTPStatus
 
@@ -39,7 +39,7 @@ def reserve_device():
         if device.status == Device.FREE:
             device.status = Device.RESERVED
             device.user = username
-            device.reservation_time = datetime.utcnow()
+            device.reservation_time = datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(timezone.utc)
             db.session.commit()
             logger.info(f'Device {device} reserved by {username}')
             return jsonify({'message': 'Device reserved'})
