@@ -60,7 +60,7 @@ const App = () => {
 
   useEffect(() => {
     fetchDevices();
-  }, );
+  }, []);
 
   const handleApiCall = async (url, method, payload, successCallback) => {
     try {
