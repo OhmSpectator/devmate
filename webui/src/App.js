@@ -274,7 +274,10 @@ const App = () => {
                       onChange={(e) => setNewDevice({...newDevice, model: e.target.value})}
                       style={{marginRight: 10}}
                   />
-                  <Button variant="contained" color="primary" onClick={handleAddDevice}>
+                  <Button variant="contained" color="primary"
+                          onClick={handleAddDevice}
+                          disabled={!newDevice.device || !newDevice.model}
+                  >
                     Add Device
                   </Button>
                   </Box>
