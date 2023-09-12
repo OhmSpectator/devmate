@@ -2,6 +2,8 @@ import argparse
 import os
 import requests
 import sys
+from datetime import datetime, timezone
+import humanize
 
 DEVMATE_ADDRESS = os.environ.get('DEVMATE_ADDRESS', 'devmate.zededa.net')
 DEVMATE_PORT = os.environ.get('DEVMATE_PORT', '8001')
@@ -27,6 +29,12 @@ def check_server_accessibility():
         return False
 
 
+# Use this function, so we can mock it in tests
+# The problem is that datetime.now() is not mockable alone
+def datetime_now():
+    return datetime.now(timezone.utc)
+
+
 def list_devices():
     response = requests.get(f"{BASE_URL}/devices/list")
     if response.status_code == 200:
@@ -36,9 +44,18 @@ def list_devices():
             status = device.get('status')
             reserved_by = device.get('user')
             if status == 'reserved' and reserved_by:
-                print(f"    {device.get('name')} ({device.get('model')}) - {status} by {reserved_by}")
+                # Assuming that the reservation time is in UTC
+                utc_time = datetime.fromisoformat(device.get('reservation_time')).replace(tzinfo=timezone.utc)
+                # Convert to local time
+                local_time = utc_time.astimezone()
+                # Format as a string
+                reserved_at = local_time.strftime("%d.%m.%Y %H:%M:%S")
+                # For how long the device is reserved
+                reserved_for = datetime_now() - utc_time
+                reserved_for = humanize.naturaldelta(reserved_for)
+                print(f"    {device.get('name')} ({device.get('model')}) is {status} by {reserved_by} {reserved_at} ({reserved_for} by now)")
             else:
-                print(f"    {device.get('name')} ({device.get('model')}) - {status}")
+                print(f"    {device.get('name')} ({device.get('model')}) is {status}")
     elif response.status_code == 204:
         print("No devices found.")
     else:

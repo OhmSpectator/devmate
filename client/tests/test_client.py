@@ -3,6 +3,7 @@ import sys
 import unittest
 from unittest.mock import patch, Mock
 from http import HTTPStatus
+from datetime import datetime, timezone
 
 import requests
 
@@ -40,7 +41,7 @@ class TestListDevices(unittest.TestCase):
         mock_get.return_value.status_code = HTTPStatus.OK
         mock_get.return_value.json.return_value = {'devices': [{'name': 'Device1', 'model': 'Model1', 'status': 'free'}]}
         device_management.list_devices()
-        expected_output = "Found 1 device:\n    Device1 (Model1) - free\n"
+        expected_output = "Found 1 device:\n    Device1 (Model1) is free\n"
         self.assertEqual(mock_stdout.getvalue(), expected_output)
 
     @patch('requests.get')
@@ -50,18 +51,23 @@ class TestListDevices(unittest.TestCase):
         device_management.list_devices()
         expected_output = "No devices found.\n"
         self.assertEqual(mock_stdout.getvalue(), expected_output)
-        
+
+    @patch('devmatecli.client.datetime_now')
     @patch('requests.get')
     @patch('sys.stdout', new_callable=io.StringIO)
-    def test_list_devices_reserved_by(self, mock_stdout, mock_get):
+    def test_list_devices_reserved_by(self, mock_stdout, mock_get, mock_datetime_now):
+        mock_datetime_now.return_value = datetime(2021, 1, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
         mock_get.return_value.status_code = HTTPStatus.OK
         mock_get.return_value.json.return_value = {
             'devices': [
-                {'name': 'Device1', 'model': 'Model1', 'status': 'reserved', 'user': 'User1'}
+                {'name': 'Device1', 'model': 'Model1', 'status': 'reserved', 'user': 'User1',
+                'reservation_time': '2021-01-01T00:00:00.000000+00:00'}
             ]
         }
         device_management.list_devices()
-        expected_output = "Found 1 device:\n    Device1 (Model1) - reserved by User1\n"
+
+        # Match the output including the date and duration strings
+        expected_output = "Found 1 device:\n    Device1 (Model1) is reserved by User1 01.01.2021 01:00:00 (an hour by now)\n"
         self.assertEqual(mock_stdout.getvalue(), expected_output)
 
     @patch('requests.get')
