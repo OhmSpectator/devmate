@@ -30,7 +30,7 @@ const App = () => {
   const [devices, setDevices] = useState([]);
   const [newDevice, setNewDevice] = useState({ device: '', model: '' });
   const [statusMessage, setStatusMessage] = useState('');
-  const [showAddDevice, setShowAddDevice] = useState(false); // New state to handle the collapse
+  const [showMaintenanceMode, setShowMaintenanceMode] = useState(false);
   const [showStatus, setShowStatus] = useState(false);
   const [deviceUsernames, setDeviceUsernames] = useState({});
 
@@ -220,7 +220,7 @@ const App = () => {
                   <TableCell>Model</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Reservation</TableCell>
-                  <TableCell>Maintenance</TableCell>
+                  {showMaintenanceMode && <TableCell>Maintenance</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -284,7 +284,7 @@ const App = () => {
                             </Grid>
                           </Grid>
                         </TableCell>
-                        <TableCell>
+                        {showMaintenanceMode && <TableCell>
                           {(
                               <Box display={"flex"} alignItems={"center"} sx={{gap: 1}}>
                                 {device.status !== "offline" ? (
@@ -313,7 +313,7 @@ const App = () => {
                                 </Button>
                               </Box>
                           )}
-                        </TableCell>
+                        </TableCell>}
                       </TableRow>
                   );
                 })}
@@ -322,10 +322,11 @@ const App = () => {
           </TableContainer>
           <div>
             <Box mt={3}>
-              <Button variant="outlined" color="primary" onClick={() => setShowAddDevice(!showAddDevice)}>
-                {showAddDevice ? 'Hide Add Device' : 'Show Add Device'}
+              <Button variant="outlined" color="primary" onClick={() => setShowMaintenanceMode(!showMaintenanceMode)}>
+                {showMaintenanceMode ? 'Hide Maintenance Mode' : 'Show Maintenance Mode'} {/* Rename the button */}
               </Button>
-              <Collapse in={showAddDevice}>
+
+              <Collapse in={showMaintenanceMode}>
                 <div style={{marginTop: 20}}>
                   <h2>Add Device</h2>
                   <Box alignItems={"center"} display={"flex"} sx={{gap: 1}}>
