@@ -3,6 +3,7 @@ import unittest
 from devmateback.app import app, db
 from devmateback.models import Device
 from http import HTTPStatus
+from datetime import datetime
 
 
 class BaseTestCase(unittest.TestCase):
@@ -42,8 +43,9 @@ class TestListDevices(BaseTestCase):
 
     def test_list_devices_with_data(self):
         with app.app_context():
-            device1 = Device(name='Device1', model='Model1', status='free')
-            device2 = Device(name='Device2', model='Model2', status='free')
+            current_time = datetime.utcnow()
+            device1 = Device(name='Device1', model='Model1', status='free', reservation_time=current_time)
+            device2 = Device(name='Device2', model='Model2', status='free', reservation_time=current_time)
             db.session.add(device1)
             db.session.add(device2)
             db.session.commit()
@@ -54,6 +56,12 @@ class TestListDevices(BaseTestCase):
         self.assertEqual(response.get_json()['devices'][0]['name'], 'Device1')
         self.assertEqual(response.get_json()['devices'][1]['name'], 'Device2')
 
+        returned_time1 = datetime.fromisoformat(response.get_json()['devices'][0]['reservation_time'])
+        returned_time2 = datetime.fromisoformat(response.get_json()['devices'][1]['reservation_time'])
+
+        # Comparison
+        self.assertEqual(current_time, returned_time1)
+        self.assertEqual(current_time, returned_time2)
 
 class TestAddDevice(BaseTestCase):
     

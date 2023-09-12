@@ -1,5 +1,6 @@
 import logging
 
+from datetime import datetime
 from flask import Blueprint, request, jsonify
 from http import HTTPStatus
 
@@ -38,6 +39,7 @@ def reserve_device():
         if device.status == Device.FREE:
             device.status = Device.RESERVED
             device.user = username
+            device.reservation_time = datetime.utcnow()
             db.session.commit()
             logger.info(f'Device {device} reserved by {username}')
             return jsonify({'message': 'Device reserved'})
@@ -64,6 +66,7 @@ def release_device():
         if device.status == Device.RESERVED:
             device.status = Device.FREE
             device.user = None
+            device.reservation_time = None
             db.session.commit()
             logger.info(f'Device {device} released')
             return jsonify({'message': 'Device released'})
@@ -111,6 +114,7 @@ def set_device_offline():
         if device.status != Device.OFFLINE:
             device.status = Device.OFFLINE
             device.user = None
+            device.reservation_time = None
             db.session.commit()
             logger.info(f'Device {device} set to offline')
             return jsonify({'message': 'Device set to offline'}), HTTPStatus.OK

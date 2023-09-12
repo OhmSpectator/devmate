@@ -253,6 +253,10 @@ components:
           enum: ["free", "reserved", "offline"]
         user:
           type: "string"
+        reservation_time:
+          type: "string"
+          format: "date-time"
+          description: "The time when the device was reserved. Null if not reserved."
           
     DevicesResponse:
       type: "object"
