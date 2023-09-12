@@ -190,11 +190,6 @@ const App = () => {
   };
 
   const handleRelease = (deviceName) => {
-    if (!deviceUsernames[deviceName]) {
-      const errorMessage = 'Username is required to release a device.';
-      customSetStatusMessage(errorMessage, true);
-      return;
-    }
     handleUsernameChange({target: {value: ''}}, deviceName);
     handleAction('release', deviceName);
   }
