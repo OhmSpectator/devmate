@@ -18,6 +18,9 @@ import axios from 'axios';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
+import moment from 'moment';
+import 'moment-duration-format';
+
 const theme = createTheme({
 });
 
@@ -58,9 +61,37 @@ const App = () => {
   }
 };
 
+  // useEffect to handle initial fetch
   useEffect(() => {
     fetchDevices();
-  }, []);
+  }, []); // Run only once when the component mounts
+
+
+  useEffect(() => {
+    // Define the interval IDs for each device
+    const intervalIds = {};
+
+    // Run once initially to set the timers for existing devices
+    devices.forEach(device => {
+      if (device.status === 'reserved') {
+        intervalIds[device.name] = setInterval(() => {
+          setDevices(prevDevices => {
+            return prevDevices.map(d => {
+              if (d.name === device.name) {
+                d.duration = calculateTimeDifference(device.reservation_time); // Update the duration field
+              }
+              return d;
+            });
+          });
+        }, 1000); // Update every second
+      }
+    });
+
+    return () => {
+      // Clear all intervals when component unmounts
+      Object.values(intervalIds).forEach(clearInterval);
+    };
+  }, [devices]);
 
   const handleApiCall = async (url, method, payload, successCallback) => {
     try {
@@ -159,6 +190,14 @@ const App = () => {
     handleAction('online', deviceName);
   }
 
+  const calculateTimeDifference = (reservation_time) => {
+    const now = moment(); // local time
+    const reservedTime = moment.utc(reservation_time).local(); // convert UTC to local time
+    const duration = moment.duration(now.diff(reservedTime));
+
+    return duration.format("d [days] h [hrs] m [min] s [sec]");
+  };
+
   return (
       <div>
         <Box m={3}>
@@ -183,7 +222,26 @@ const App = () => {
                       <TableRow key={device.name}>
                         <TableCell>{device.name}</TableCell>
                         <TableCell>{device.model}</TableCell>
-                        <TableCell>{device.status}</TableCell>
+                        <TableCell>
+                          <Box alignItems={"center"}>
+                          {device.status === 'reserved' ? (
+                            <>
+                            <div className={`status-${device.status}`}>
+                            {device.status}
+                            </div>
+                            At: {new Date(device.reservation_time + 'Z').toLocaleString()}
+                            <br />
+                            Duration: {calculateTimeDifference(device.reservation_time)}
+                            </>
+                            ) : (
+                            <>
+                            <div className={`status-${device.status}`}>
+                              {device.status}
+                            </div>
+                            </>
+                          )}
+                            </Box>
+                        </TableCell>
                         <TableCell>
                           <Grid container alignItems="center">
                             <Grid item xs={6}>

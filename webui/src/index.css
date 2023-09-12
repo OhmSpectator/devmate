@@ -1,0 +1,11 @@
+.status-free {
+    color: green;
+}
+
+.status-reserved {
+    color: orange;
+}
+
+.status-offline {
+    color: red;
+}
