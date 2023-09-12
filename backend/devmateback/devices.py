@@ -110,6 +110,7 @@ def set_device_offline():
     if device:
         if device.status != Device.OFFLINE:
             device.status = Device.OFFLINE
+            device.user = None
             db.session.commit()
             logger.info(f'Device {device} set to offline')
             return jsonify({'message': 'Device set to offline'}), HTTPStatus.OK
