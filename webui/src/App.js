@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Box, Snackbar } from '@mui/material';
+import {Box, Snackbar, CssBaseline} from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import axios from 'axios';
@@ -12,7 +12,36 @@ import DevicesList from "./DevicesList";
 import {calculateTimeDiff} from "./DeviceRow";
 
 
-const theme = createTheme({});
+const theme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: "#1f1d1d",
+      paper: "#1e1e1e",
+    },
+    primary: {
+      main: "#4b86b4",  // Soft Blue
+      contrastText: "#e8e8e8",
+    },
+    secondary: {
+      main: "#d76f6f",  // Soft Pink
+      contrastText: "#e8e8e8",
+    },
+    text: {
+      primary: "#a4a4a4",  // Off-white
+      secondary: "#7e7e7e",  // Gray
+    },
+    error: {
+      main: "#ff1744",  // Bright Red
+    },
+    warning: {
+      main: "#ff9800",  // Orange
+    },
+    success: {
+      main: "#4caf50",  // Green
+    },
+  }
+})
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
@@ -388,7 +417,10 @@ const App = () => {
 // Wrap the App component with ThemeProvider
 const WrappedApp = () => (
   <ThemeProvider theme={theme}>
+    <CssBaseline /> {/* Normalize CSS */}
+    <div style={{ backgroundColor: theme.palette.background.default }}>
     <App />
+    </div>
   </ThemeProvider>
 );
 

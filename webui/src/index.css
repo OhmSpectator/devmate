@@ -1,11 +1,13 @@
+/* Dark Theme Status Colors */
+
 .status-free {
-    color: green;
+    color: #4CAF50; /* A softer green */
 }
 
 .status-reserved {
-    color: orange;
+    color: #FFC107; /* A softer orange */
 }
 
 .status-offline {
-    color: red;
+    color: #F44336; /* A softer red */
 }
