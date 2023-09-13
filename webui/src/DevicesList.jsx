@@ -2,9 +2,8 @@ import {Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, T
 import DeviceRow from "./DeviceRow";
 import React, {useState} from "react";
 
-const  DevicesList = ({devices, handleUsernameChange, deviceUsernames, handleReserve, handleRelease, handleAction, handleDelete, handleOnline}) => {
+const  DevicesList = ({devices, handleUsernameChange, deviceUsernames, handleReserve, handleRelease, handleOffline, handleDelete, handleOnline}) => {
     const [showMaintenanceMode, setShowMaintenanceMode] = useState(false);
-    console.log(devices);
     return (
         <TableContainer component={Paper}>
             <Table style={{tableLayout: "fixed"}}>
@@ -31,7 +30,7 @@ const  DevicesList = ({devices, handleUsernameChange, deviceUsernames, handleRes
                             deviceUsernames={deviceUsernames}
                             handleReserve={handleReserve}
                             handleRelease={handleRelease}
-                            handleAction={handleAction}
+                            handleOffline={handleOffline}
                             handleDelete={handleDelete}
                             handleOnline={handleOnline}
                             showMaintenanceMode={showMaintenanceMode}

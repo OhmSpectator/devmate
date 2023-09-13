@@ -1,19 +1,43 @@
 import React from 'react';
-import { TableCell, TableRow } from '@mui/material';
+import {Box, TableCell, TableRow} from '@mui/material';
 import 'moment-duration-format';
 
 import ReserveGroup from "./ReserveGroup";
 import MaintenanceGroup from "./MaintenanceGroup";
+import moment from "moment/moment";
 
-const DeviceRow = ({device, handleUsernameChange, deviceUsernames, handleReserve, handleRelease, handleAction, handleDelete, handleOnline, showMaintenanceMode}) => {
+export const calculateTimeDiff = (reservation_time) => {
+    const now = moment(); // local time
+    const reservedTime = moment.utc(reservation_time).local(); // convert UTC to local time
+    const duration = moment.duration(now.diff(reservedTime));
+
+    return duration.format("d [days] h [hrs] m [min] s [sec]");
+};
+
+const DeviceRow = ({device, handleUsernameChange, deviceUsernames, handleReserve, handleRelease, handleOffline, handleDelete, handleOnline, showMaintenanceMode}) => {
     return (
         <TableRow key={device.name}>
             <TableCell>{device.name}</TableCell>
             <TableCell>{device.model}</TableCell>
             <TableCell>
-                <div className={`status-${device.status}`}>
-                    {device.status}
-                </div>
+                <Box alignItems={"center"}>
+                    {device.status === 'reserved' ? (
+                        <>
+                            <div className={`status-${device.status}`}>
+                                {device.status}
+                            </div>
+                            At: {new Date(device.reservation_time + 'Z').toLocaleString()}
+                            <br/>
+                            Duration: {calculateTimeDiff(device.reservation_time)}
+                        </>
+                    ) : (
+                        <>
+                            <div className={`status-${device.status}`}>
+                                {device.status}
+                            </div>
+                        </>
+                    )}
+                </Box>
             </TableCell>
             <ReserveGroup
                 device={device}
@@ -23,7 +47,7 @@ const DeviceRow = ({device, handleUsernameChange, deviceUsernames, handleReserve
                 handleRelease={handleRelease}/>
             <MaintenanceGroup
                 device={device}
-                handleAction={handleAction}
+                handleOffline={handleOffline}
                 handleDelete={handleDelete}
                 handleOnline={handleOnline}
                 showMaintenanceMode={showMaintenanceMode}/>
