@@ -18,6 +18,35 @@ paths:
         '204':
           description: "No devices found"
 
+  /devices/add:
+    post:
+      summary: "Add a new device"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddDeviceRequest"
+      responses:
+        '201':
+          description: "Device successfully added"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '409':
+          description: "Device with this name already exists"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: "Bad Request: JSON body expected, or missing/empty device or model fields."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
   /devices/reserve:
     post:
       summary: "Reserve a device"
@@ -54,35 +83,6 @@ paths:
                 $ref: '#/components/schemas/Message'
         '400':
           description: "Bad Request: JSON body expected, or missing/empty device or username fields."
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-
-  /devices/add:
-    post:
-      summary: "Add a new device"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AddDeviceRequest"
-      responses:
-        '201':
-          description: "Device successfully added"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-        '409':
-          description: "Device with this name already exists"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-        '400':
-          description: "Bad Request: JSON body expected, or missing/empty device or model fields."
           content:
             application/json:
               schema:
