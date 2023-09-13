@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  webui:  # frontend service
+    build:
+      context: ./webui  # The directory containing your frontend's Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  backend:  # backend service
+    build:
+      context: ./backend  # The directory containing your backend's Dockerfile
+    ports:
+      - "8001:8000"
