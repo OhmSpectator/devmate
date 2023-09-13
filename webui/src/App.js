@@ -31,6 +31,7 @@ const App = () => {
   const [newDevice, setNewDevice] = useState({ device: '', model: '' });
   const [statusMessage, setStatusMessage] = useState('');
   const [showMaintenanceMode, setShowMaintenanceMode] = useState(false);
+  const [showAddDeviceMode, setShowAddDeviceMode] = useState(false);
   const [showStatus, setShowStatus] = useState(false);
   const [deviceUsernames, setDeviceUsernames] = useState({});
 
@@ -220,7 +221,11 @@ const App = () => {
                   <TableCell>Model</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Reservation</TableCell>
-                  {showMaintenanceMode && <TableCell>Maintenance</TableCell>}
+                  <TableCell>
+                    <Button variant="outlined" color="primary" onClick={() => setShowMaintenanceMode(!showMaintenanceMode)}>
+                      {showMaintenanceMode ? 'Maintenance' : 'Maintenance'} {/* Rename the button */}
+                    </Button>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -284,7 +289,9 @@ const App = () => {
                             </Grid>
                           </Grid>
                         </TableCell>
-                        {showMaintenanceMode && <TableCell>
+                        <TableCell   style={{
+                          visibility: showMaintenanceMode ? 'visible' : 'hidden'
+                        }}>
                           {(
                               <Box display={"flex"} alignItems={"center"} sx={{gap: 1}}>
                                 {device.status !== "offline" ? (
@@ -313,7 +320,7 @@ const App = () => {
                                 </Button>
                               </Box>
                           )}
-                        </TableCell>}
+                        </TableCell>
                       </TableRow>
                   );
                 })}
@@ -322,11 +329,11 @@ const App = () => {
           </TableContainer>
           <div>
             <Box mt={3}>
-              <Button variant="outlined" color="primary" onClick={() => setShowMaintenanceMode(!showMaintenanceMode)}>
-                {showMaintenanceMode ? 'Hide Maintenance Mode' : 'Show Maintenance Mode'} {/* Rename the button */}
+              <Button variant="outlined" color="primary" onClick={() => setShowAddDeviceMode(!showAddDeviceMode)}>
+                {showAddDeviceMode ? 'Hide Add Device' : 'Show Add Device'} {/* Rename the button */}
               </Button>
 
-              <Collapse in={showMaintenanceMode}>
+              <Collapse in={showAddDeviceMode}>
                 <div style={{marginTop: 20}}>
                   <h2>Add Device</h2>
                   <Box alignItems={"center"} display={"flex"} sx={{gap: 1}}>
