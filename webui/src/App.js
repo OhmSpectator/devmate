@@ -21,6 +21,8 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import moment from 'moment';
 import 'moment-duration-format';
 
+import Snackbar from '@mui/material/Snackbar';
+
 const theme = createTheme({
 });
 
@@ -32,15 +34,18 @@ const App = () => {
   const [statusMessage, setStatusMessage] = useState('');
   const [showMaintenanceMode, setShowMaintenanceMode] = useState(false);
   const [showAddDeviceMode, setShowAddDeviceMode] = useState(false);
-  const [showStatus, setShowStatus] = useState(false);
   const [deviceUsernames, setDeviceUsernames] = useState({});
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
-
-
-
-  const customSetStatusMessage = (message, shouldShow) => {
+  const showSnackbar = (message) => {
     setStatusMessage(message);
-    setShowStatus(shouldShow);
+    setOpenSnackbar(true);
+  };
+
+  const showSnackbarMessage = (message, shouldShow) => {
+    if (shouldShow) {
+      showSnackbar(message);
+    }
   };
 
   const fetchDevices = async () => {
@@ -49,16 +54,16 @@ const App = () => {
 
     if (response.status === 200) {
       setDevices(response.data.devices);
-      customSetStatusMessage('Devices fetched successfully.', false);
+      showSnackbarMessage('Devices fetched successfully.', false);
     } else if (response.status === 204) {
       console.log('No devices to fetch, but the operation was successful.');
-      customSetStatusMessage('No devices available.', false);
+      showSnackbarMessage('No devices available.', false);
       setDevices([]); // Optionally set devices to an empty array
     }
 
   } catch (error) {
     console.error('Failed to fetch devices:', error);
-    customSetStatusMessage('Failed to fetch devices.', true);
+    showSnackbarMessage('Failed to fetch devices.', true);
   }
 };
 
@@ -112,16 +117,16 @@ const App = () => {
     try {
       const response = await axios({ method, url, data: payload });
       successCallback(response);
-      customSetStatusMessage(`Operation successful: ${url}`, false);
+      showSnackbarMessage(`Operation successful: ${url}`, false);
     } catch (error) {
       if (error.response) {
-        const errorMessage = `Error: ${error.response.status} - ${error.response.data.message}`;
+        const errorMessage = `Error: ${error.response.data.message}`;
         console.warn(errorMessage);
-        customSetStatusMessage(errorMessage, true);
+        showSnackbarMessage(errorMessage, true);
       } else {
         const generalError = 'A network error occurred.';
-        console.error(generalError);
-        customSetStatusMessage(generalError, true);
+        console.error(generalError, error)
+        showSnackbarMessage(generalError, true);
       }
     }
   };
@@ -130,18 +135,17 @@ const App = () => {
     const localUsername = deviceUsernames[deviceName];
     if(!localUsername) {
       const errorMessage = 'Username is required to reserve a device.';
-      customSetStatusMessage(errorMessage, true);
+      showSnackbarMessage(errorMessage, true);
       return;
     }
 
     try {
       const payload = { device: deviceName, username: localUsername };
-      console.log("username: " + localUsername + " device: " + deviceName);
       const response = await axios.post(`${backendUrl}/devices/reserve`, payload);
 
       if (response.status === 200) {
         await fetchDevices();
-        customSetStatusMessage('Device successfully reserved.', false);
+        showSnackbarMessage('Device successfully reserved.', false);
       }
     } catch (error) {
       if (error.response) {
@@ -149,14 +153,14 @@ const App = () => {
 
         if (statusCode === 409) {
           const reservedBy = error.response.data.reserved_by;
-          customSetStatusMessage(`Device is already reserved by ${reservedBy}`, true);
+          showSnackbarMessage(`Device is already reserved by ${reservedBy}`, true);
         } else if (statusCode === 404) {
-          customSetStatusMessage('Specified device does not exist.', true);
+          showSnackbarMessage('Specified device does not exist.', true);
         } else if (statusCode === 400) {
-          customSetStatusMessage('Bad request. Missing or empty device or username fields.', true);
+          showSnackbarMessage('Bad request. Missing or empty device or username fields.', true);
         }
       } else {
-        customSetStatusMessage(`A network error occurred}`, true);
+        showSnackbarMessage(`A network error occurred}`, true);
       }
     }
   };
@@ -170,18 +174,25 @@ const App = () => {
     handleApiCall(`${backendUrl}/devices/delete/${deviceName}`, 'delete', null, fetchDevices).then(r => console.log('Device deleted successfully.'));
   };
 
-  const handleAddDevice = () => {
+
+  const handleAddDevice = async () => {
     if (!newDevice.device || !newDevice.model) {
       const errorMessage = 'Device name and model are required to add a new device.';
       console.warn(errorMessage);
-      customSetStatusMessage(errorMessage, true);
+      showSnackbarMessage(errorMessage, true);
       return;
     }
-    handleApiCall(`${backendUrl}/devices/add`, 'post', {device: newDevice.device, model: newDevice.model}, () => {
+
+    try {
+      const addDeviceResult = await handleApiCall(`${backendUrl}/devices/add`, 'post', {device: newDevice.device, model: newDevice.model}, fetchDevices);
+      if (addDeviceResult && addDeviceResult.status === 201) {
+        console.log('Device added successfully.');
+      }
       setNewDevice({device: '', model: ''});
-      fetchDevices().then(r => console.log('Devices fetched successfully.'));
-    }).then(r => console.log('Device added successfully.'));
-   };
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
 
   const handleUsernameChange = (event, deviceName) => {
     setDeviceUsernames({
@@ -355,17 +366,17 @@ const App = () => {
                   >
                     Add Device
                   </Button>
+                    <Snackbar
+                        open={openSnackbar}
+                        onClose={() => setOpenSnackbar(false)}
+                        message={<span>{statusMessage}</span>}
+                        autoHideDuration={5000}
+                    />
                   </Box>
                 </div>
               </Collapse>
             </Box>
           </div>
-          {showStatus && (
-              <div>
-                <h2>Status Messages</h2>
-                <p>{statusMessage}</p>
-              </div>
-          )}
         </Box>
       </div>
   );
