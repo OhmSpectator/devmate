@@ -357,33 +357,31 @@ const App = () => {
 
 
   return (
-      <>
-        <Box m={3}>
-          <h1>Device Management System</h1>
-          <h2>Available Devices</h2>
-          <DevicesList
-              devices={devices}
-              deviceUsernames={deviceUsernames}
-              handleUsernameChange={handleUsernameChange}
-              handleReserve={handleReserve}
-              handleRelease={handleRelease}
-              handleOnline={handleOnline}
-              handleOffline={handleOffline}
-              handleDelete={handleDelete}
-          />
-          <AddDeviceSection
-              newDevice={newDevice}
-              setNewDevice={setNewDevice}
-              handleAddDevice={handleAddDevice}
-          />
-          <Snackbar
-              open={openSnackbar}
-              onClose={() => setOpenSnackbar(false)}
-              message={<span>{statusMessage}</span>}
-              autoHideDuration={5000}
-          />
-        </Box>
-      </>
+      <Box m={3}>
+        <h1>Device Management System</h1>
+        <h2>Available Devices</h2>
+        <DevicesList
+            devices={devices}
+            deviceUsernames={deviceUsernames}
+            handleUsernameChange={handleUsernameChange}
+            handleReserve={handleReserve}
+            handleRelease={handleRelease}
+            handleOnline={handleOnline}
+            handleOffline={handleOffline}
+            handleDelete={handleDelete}
+        />
+        <AddDeviceSection
+            newDevice={newDevice}
+            setNewDevice={setNewDevice}
+            handleAddDevice={handleAddDevice}
+        />
+        <Snackbar
+            open={openSnackbar}
+            onClose={() => setOpenSnackbar(false)}
+            message={<span>{statusMessage}</span>}
+            autoHideDuration={5000}
+        />
+      </Box>
   );
 };
 
