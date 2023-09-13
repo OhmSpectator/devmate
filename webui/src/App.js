@@ -42,28 +42,20 @@ const App = () => {
     setOpenSnackbar(true);
   };
 
-  const showSnackbarMessage = (message, shouldShow) => {
-    if (shouldShow) {
-      showSnackbar(message);
-    }
-  };
-
   const fetchDevices = async () => {
   try {
     const response = await axios.get(`${backendUrl}/devices/list`);
 
     if (response.status === 200) {
+      console.log("Devices fetched successfully.");
       setDevices(response.data.devices);
-      showSnackbarMessage('Devices fetched successfully.', false);
     } else if (response.status === 204) {
       console.log('No devices to fetch, but the operation was successful.');
-      showSnackbarMessage('No devices available.', false);
-      setDevices([]); // Optionally set devices to an empty array
+      setDevices([]);
     }
 
   } catch (error) {
     console.error('Failed to fetch devices:', error);
-    showSnackbarMessage('Failed to fetch devices.', true);
   }
 };
 
@@ -117,16 +109,14 @@ const App = () => {
     try {
       const response = await axios({ method, url, data: payload });
       successCallback(response);
-      showSnackbarMessage(`Operation successful: ${url}`, false);
     } catch (error) {
       if (error.response) {
         const errorMessage = `Error: ${error.response.data.message}`;
         console.warn(errorMessage);
-        showSnackbarMessage(errorMessage, true);
+        showSnackbar(errorMessage);
       } else {
         const generalError = 'A network error occurred.';
         console.error(generalError, error)
-        showSnackbarMessage(generalError, true);
       }
     }
   };
@@ -134,8 +124,7 @@ const App = () => {
   const handleReserve = async (deviceName) => {
     const localUsername = deviceUsernames[deviceName];
     if(!localUsername) {
-      const errorMessage = 'Username is required to reserve a device.';
-      showSnackbarMessage(errorMessage, true);
+      console.warn('Username is required to reserve a device.');
       return;
     }
 
@@ -145,22 +134,20 @@ const App = () => {
 
       if (response.status === 200) {
         await fetchDevices();
-        showSnackbarMessage('Device successfully reserved.', false);
       }
     } catch (error) {
       if (error.response) {
         const statusCode = error.response.status;
-
         if (statusCode === 409) {
           const reservedBy = error.response.data.reserved_by;
-          showSnackbarMessage(`Device is already reserved by ${reservedBy}`, true);
+          console.warn(`Device is already reserved by ${reservedBy}`);
         } else if (statusCode === 404) {
-          showSnackbarMessage('Specified device does not exist.', true);
+          console.warn(`Device ${deviceName} does not exist.`);
         } else if (statusCode === 400) {
-          showSnackbarMessage('Bad request. Missing or empty device or username fields.', true);
+          console.error(`Bad request. Missing or empty device or username fields.`);
         }
       } else {
-        showSnackbarMessage(`A network error occurred}`, true);
+        console.error('An error occurred:', error);
       }
     }
   };
@@ -179,7 +166,6 @@ const App = () => {
     if (!newDevice.device || !newDevice.model) {
       const errorMessage = 'Device name and model are required to add a new device.';
       console.warn(errorMessage);
-      showSnackbarMessage(errorMessage, true);
       return;
     }
 
