@@ -32,6 +32,7 @@ host-stop:
 host-clean: host-stop venv-clean
 	@rm -rf devices.db
 	@rm -rf devmate.log
+	@rm -rf devmateback/__pycache__
 
 host-log-follow:
 	@tail -f $(APP_DIR)/devmate.log
@@ -90,9 +91,10 @@ clean-db:
 
 clean-tests: clean-logs
 	@rm -rf .pytest_cache
+	@rm -rf tests/__pycache__
 
 # remove everything
-clean: docker-clean clean-tests
+clean: docker-clean clean-tests host-clean
 
 # Check if the container is up
 docker-check:
