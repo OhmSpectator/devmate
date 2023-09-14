@@ -45,6 +45,8 @@ clean:
 	rm -rf $(VENV)
 	rm -rf devmatecli/__pycache__
 	rm -rf tests/__pycache__
+	rm -rf tests/*.log
+	rm -rf tests/.pytest_cache
 	@echo "Clean complete."
 
 .PHONY: all setup build tests clean check-python check-venv
