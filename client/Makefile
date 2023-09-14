@@ -8,6 +8,7 @@ TEST_DIR = tests
 TEST_SCRIPT = test_client.py
 CLI_SCRIPT = devmatecli/client.py
 REQUIREMENTS = requirements.txt
+OUTPUT_CLI_NAME = devmate
 
 # Targets
 
@@ -29,8 +30,9 @@ setup: check-python
 
 build: check-venv
 	@echo "Building standalone binary..."
-	. $(VENV)/bin/activate; $(PYINSTALLER) --onefile $(CLI_SCRIPT)
-	@echo "Build complete. Check the 'dist' directory for the binary."
+	. $(VENV)/bin/activate; $(PYINSTALLER) --onefile --name $(OUTPUT_CLI_NAME) $(CLI_SCRIPT)
+	@echo "Build complete. The final binary is located at 'dist/devmate'."
+
 
 tests: check-venv
 	@echo "Running unit tests..."
