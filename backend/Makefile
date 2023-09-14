@@ -16,7 +16,7 @@ APP_DIR := ./devmateback
 VENV := venv
 INDOCKER_USER := devmate
 
-host-run: host-clean venv-check
+host-run: venv-check
 	. $(VENV)/bin/activate; \
 	FLASK_APP=devmateback.app FLASK_ENV=development FLASK_RUN_PORT=$(HOST_PORT) flask run --host=0.0.0.0
 
