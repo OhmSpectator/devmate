@@ -3,7 +3,7 @@ version: '3.8'
 services:
   webui:  # frontend service
     build:
-      context: ./webui  # The directory containing your frontend's Dockerfile
+      context: ./webui
     ports:
       - "8080:80"
     depends_on:
@@ -11,6 +11,8 @@ services:
 
   backend:  # backend service
     build:
-      context: ./backend  # The directory containing your backend's Dockerfile
+      context: ./backend
     ports:
       - "8001:8000"
+    volumes:
+      - ${HOST_DB_DIR}:/app/db

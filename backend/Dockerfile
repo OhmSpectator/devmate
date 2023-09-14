@@ -1,27 +1,36 @@
 # Use an official Python runtime as a base image
 FROM python:3.10-slim-buster
 
+ENV DEVMATE_USER=devmate
+
 # Create and switch to a new user
-RUN useradd -m devmate
+RUN useradd -m ${DEVMATE_USER}
+
 # Set the working directory inside the container
-WORKDIR /app
-RUN chown devmate:devmate /app
-USER devmate
+ENV CUR_WORKDIR /app
+WORKDIR ${CUR_WORKDIR}
+# Set the DB directory, it also used by the application and passed with env variable during the gunicon run
+ENV DB_DIR=${CUR_WORKDIR}/db
+
+RUN chown -R ${DEVMATE_USER}:${DEVMATE_USER} ${CUR_WORKDIR}
+
+USER ${DEVMATE_USER}
+
+RUN mkdir -p $DB_DIR
 
 # Add the user's local bin directory to PATH
-ENV PATH="/home/devmate/.local/bin:${PATH}"
+ENV PATH="/home/${DEVMATE_USER}/.local/bin:${PATH}"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-
 # Install dependencies
-COPY requirements.txt .
+COPY --chown=${DEVMATE_USER}:${DEVMATE_USER} requirements.txt .
 RUN pip install --no-cache-dir --user --disable-pip-version-check -r requirements.txt
 
 # Copy the application into the container
-COPY --chown=devmate:devmate ./devmateback /app/devmateback
+COPY --chown=$DEVMATE_USER:$DEVMATE_USER ./devmateback /app/devmateback
 
 # Expose the port the app runs on
 EXPOSE 8000

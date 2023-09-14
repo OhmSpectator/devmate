@@ -1,4 +1,5 @@
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask, request
@@ -16,9 +17,59 @@ logger = logging.getLogger('devmate')
 logger.setLevel(logging.DEBUG)
 logger.addHandler(handler)
 
-app = Flask(__name__)
-CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///devices.db'
+
+def init_db(app_to_setup):
+    # Get the path to the database directory
+    db_dir = os.environ.get('DB_DIR', os.getcwd())
+
+    # Check that the database directory exists and is writable
+    if not os.path.exists(db_dir):
+        print("Database directory doesn't exist!")
+        return None
+    else:
+        print("Database directory exists!")
+        # check the permissions of the directory
+        if not os.access(db_dir, os.W_OK):
+            print("Database directory is not writable!")
+            return None
+        else:
+            print("Database directory is writable!")
+
+    # Set up the database
+    db_path = os.path.join(db_dir, 'devices.db')
+    print(f'Using database at {db_path}')
+    app_to_setup.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+
+    # Initialize the database
+    db.init_app(app_to_setup)
+
+    # Create the database tables
+    with app_to_setup.app_context():
+        db.create_all()
+
+    return True
+
+
+def create_app():
+    # Create the Flask app
+    new_app = Flask(__name__)
+
+    # Enable CORS (Cross-Origin Resource Sharing). This is needed to allow the frontend to access the backend.
+    CORS(new_app)
+
+    if not init_db(new_app):
+        return None
+
+    # Register the blueprint
+    new_app.register_blueprint(devices_bp, url_prefix='/devices')
+
+    return new_app
+
+
+app = create_app()
+if app is None:
+    print("Failed to create the Flask app!")
+    exit(1)
 
 
 @app.before_request
@@ -37,15 +88,6 @@ def after_request(response):
 def health_check():
     return '', 200
 
-
-# Initialize the database with the app
-db.init_app(app)
-
-# Register the blueprint
-app.register_blueprint(devices_bp, url_prefix='/devices')
-
-with app.app_context():
-    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -152,7 +152,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
 # pytype static type analyzer
 .pytype/
 
@@ -166,3 +165,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
+# devices.db file in all subdirectories
+**/devices.db
