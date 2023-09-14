@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Publish CLI Binaries
+    name: Build CLI
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -54,14 +54,38 @@ jobs:
           pyinstaller --onefile --name devmate client\devmatecli\client.py
         shell: powershell
 
-      - name: Make binary executable (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          chmod +x dist/devmate
-        shell: bash
-
       - name: Upload Binary
         uses: actions/upload-artifact@v3.1.3
         with:
           name: devmatecli-${{ matrix.os }}
           path: ./dist/devmate*
+
+  release:
+    needs: build
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      # Need to get the release-cli.js script
+      - name: Checkout Code
+        uses: actions/checkout@v4.0.0
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
+
+      - name: Archive Artifacts
+        run: |
+          tar czvf devmate-cli.tar.gz -C artifacts .
+        shell: bash
+
+      - name: Create Release
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const createReleaseLogic = require('.github/scripts/release-cli.js');
+            createReleaseLogic({ github, context, core });
