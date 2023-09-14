@@ -13,6 +13,6 @@ services:
     build:
       context: ./backend
     ports:
-      - "8001:8000"
+      - "8000:8000"
     volumes:
       - ${HOST_DB_DIR}:/app/db
