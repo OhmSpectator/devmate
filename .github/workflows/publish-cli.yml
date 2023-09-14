@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Publish CLI Binaries
+    name: Build CLI
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -54,14 +54,73 @@ jobs:
           pyinstaller --onefile --name devmate client\devmatecli\client.py
         shell: powershell
 
-      - name: Make binary executable (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          chmod +x dist/devmate
-        shell: bash
-
       - name: Upload Binary
         uses: actions/upload-artifact@v3.1.3
         with:
           name: devmatecli-${{ matrix.os }}
           path: ./dist/devmate*
+
+  release:
+    needs: build
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
+
+      - name: Create GitHub Release and Upload Binaries
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Construct a tag name in a format of YY.MM.dd.HASH
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear().toString().substr(-2);
+            const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const currentDay = currentDate.getDate().toString().padStart(2, '0');
+            const commitHash = context.sha.substring(0, 4);  // Taking first 4 characters of commit hash
+            const tagName = `${currentYear}.${currentMonth}.${currentDay}.${commitHash}`;
+            
+            let release;
+            try {
+              release = await github.rest.repos.createRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_name: tagName,
+                name: "DevMate CLI",
+              });
+            } catch (e) {
+              console.error("Failed to create release: ", e);
+              return;
+            }
+            
+            // List downloaded artifacts
+            const artifactFolder = './artifacts';
+            const filenames = fs.readdirSync(artifactFolder);
+            
+            // Loop over the files and upload them to the release
+            for (const filename of filenames) {
+              const filePath = path.join(artifactFolder, filename);
+              const fileData = fs.readFileSync(filePath);
+            
+              try {
+                await github.rest.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: release.data.id,
+                  name: filename,
+                  data: fileData
+                });
+              } catch (e) {
+                console.error(`Failed to upload asset ${filename}: `, e);
+              }
+            }
