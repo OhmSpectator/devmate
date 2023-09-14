@@ -1,0 +1,27 @@
+name: Fetch Artifacts URLs
+on:
+  workflow_run:
+    workflows: ["Publish CLI"]
+    types:
+      - completed
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Fetch Artifact URLs
+      run: |
+        # The first workflow must have already saved the run_id somewhere
+        # Here, retrieve it and use in the curl command
+        ARTIFACTS=$(curl "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts")
+        echo $ARTIFACTS > artifacts.json
+    
+    - name: Parse Artifact URLs
+      run: |
+        cat artifacts.json | jq -r '.artifacts[] | "\(.name) \(.archive_download_url)"' | while read -r line ; do
+          NAME=$(echo $line | awk '{print $1}')
+          URL=$(echo $line | awk '{print $2}')
+          echo "Name: $NAME"
+          echo "URL: $URL"
+        done
+

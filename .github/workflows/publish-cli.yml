@@ -1,4 +1,4 @@
-name: Build CLI
+name: Publish CLI
 
 on:
   workflow_dispatch:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name: Publish CLI Binaries
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
