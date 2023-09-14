@@ -1,0 +1,66 @@
+name: Build CLI
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - client-v*
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.0.0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4.7.0
+        with:
+          python-version: '3.x'
+
+      - name: Setup Virtual Environment and Install Dependencies (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          cd client
+          pip install -r requirements.txt
+        shell: bash
+
+      - name: Setup Virtual Environment and Install Dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          python -m venv venv
+          .\venv\Scripts\Activate.ps1
+          cd client
+          pip install -r requirements.txt
+        shell: powershell
+
+      - name: Build with PyInstaller (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          source venv/bin/activate
+          pyinstaller --onefile --name devmate client/devmatecli/client.py
+        shell: bash
+
+      - name: Build with PyInstaller (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          .\venv\Scripts\Activate.ps1
+          pyinstaller --onefile --name devmate client\devmatecli\client.py
+        shell: powershell
+
+      - name: Make binary executable (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x dist/devmate
+        shell: bash
+
+      - name: Upload Binary
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: devmatecli-${{ matrix.os }}
+          path: ./dist/devmate*
