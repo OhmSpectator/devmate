@@ -43,7 +43,7 @@ const theme = createTheme({
   }
 })
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
 const App = () => {
   const [devices, setDevices] = useState([]);
@@ -51,6 +51,7 @@ const App = () => {
   const [deviceUsernames, setDeviceUsernames] = useState({});
   const [statusMessage, setStatusMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [backendAvailable, setBackendAvailable] = useState(true);
 
   const handleUsernameChange = (event, deviceName) => {
     setDeviceUsernames({
@@ -77,6 +78,11 @@ const App = () => {
       isMounted = false
     }; // Cleanup function
   }, []);
+
+  // Add a function to monitor the backendAvailabe state
+  useEffect(() => {
+    console.log("Dep is triggered... Backend is available: ", backendAvailable);
+  }, [backendAvailable]);
 
   useEffect(() => {
     // Define a single interval ID
@@ -112,17 +118,38 @@ const App = () => {
 
   };
 
-  const handleApiCall = async (endpoint, method, payload, successCallback, errorCallback) => {
-    const url = `${backendUrl}/${endpoint}`
+  const handleApiCall = async (endpoint, method, payload) => {
+    const url = `${backendUrl}${endpoint}`
     return axios({method: method, url: url, data: payload})
   };
 
+  const handleHealth = async () => {
+    const handleError = (error) => {
+      console.error('An error occurred:', error);
+      if (backendAvailable) {
+        showSnackbar('Backend is not available.');
+      }
+      setBackendAvailable(false)
+    }
+    const handleSuccess = async (response) => {
+      switch (response.status) {
+        case 200:
+          console.log("Backend is healthy.");
+          setBackendAvailable(true);
+          break;
+        default:
+          console.warn('Unexpected response status:', response.status);
+      }
+    }
+    handleApiCall(`/health`, 'get', null).then(handleSuccess).catch(handleError)
+  }
 
   const handleList = async () => {
     const handleError = (error) => {
-      console.error('An error occurred:', error);
-
+      //console.error('An error occurred:', error);
+      handleHealth();
     }
+
     const handleSuccess = async (response) => {
       switch (response.status) {
         case 200:
@@ -136,7 +163,7 @@ const App = () => {
         default:
           console.warn('Unexpected response status:', response.status);
       }
-
+      setBackendAvailable(true);
     }
     handleApiCall(`/devices/list`, 'get', null).then(handleSuccess).catch(handleError)
   };
@@ -158,6 +185,7 @@ const App = () => {
         }
       } else {
         console.error('An error occurred:', error);
+        handleHealth();
       }
     }
 
@@ -206,6 +234,7 @@ const App = () => {
         }
       } else {
         console.error('An error occurred:', error);
+        handleHealth();
       }
     }
 
@@ -253,6 +282,7 @@ const App = () => {
         }
       } else {
         console.error('An error occurred:', error);
+        handleHealth();
       }
     }
 
@@ -293,6 +323,7 @@ const App = () => {
         }
       } else {
         console.error('An error occurred:', error);
+        handleHealth();
       }
     }
 
@@ -332,6 +363,7 @@ const App = () => {
         }
       } else {
         console.error('An error occurred:', error);
+        handleHealth();
       }
     }
 
@@ -368,6 +400,7 @@ const App = () => {
         }
       } else {
         console.error('An error occurred:', error);
+        handleHealth();
       }
     }
 
@@ -387,23 +420,34 @@ const App = () => {
 
   return (
       <Box m={3}>
-        <h1>Device Management System</h1>
-        <h2>Available Devices</h2>
-        <DevicesList
-            devices={devices}
-            deviceUsernames={deviceUsernames}
-            handleUsernameChange={handleUsernameChange}
-            handleReserve={handleReserve}
-            handleRelease={handleRelease}
-            handleOnline={handleOnline}
-            handleOffline={handleOffline}
-            handleDelete={handleDelete}
-        />
-        <AddDeviceSection
-            newDevice={newDevice}
-            setNewDevice={setNewDevice}
-            handleAddDevice={handleAddDevice}
-        />
+        <div style={{position: 'relative'}}>
+          <div className={backendAvailable ? '' : 'faded'}>
+            <h1>Device Management System</h1>
+            <h2>Available Devices</h2>
+            <DevicesList
+                devices={devices}
+                deviceUsernames={deviceUsernames}
+                handleUsernameChange={handleUsernameChange}
+                handleReserve={handleReserve}
+                handleRelease={handleRelease}
+                handleOnline={handleOnline}
+                handleOffline={handleOffline}
+                handleDelete={handleDelete}
+            />
+            <AddDeviceSection
+                newDevice={newDevice}
+                setNewDevice={setNewDevice}
+                handleAddDevice={handleAddDevice}
+            />
+          </div>
+          {!backendAvailable && (
+              <div className="overlay">
+                <div>
+                  Server is not available
+                </div>
+              </div>
+          )}
+        </div>
         <Snackbar
             open={openSnackbar}
             onClose={() => setOpenSnackbar(false)}

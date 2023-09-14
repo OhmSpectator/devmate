@@ -11,3 +11,19 @@
 .status-offline {
     color: #F44336; /* A softer red */
 }
+
+.faded {
+    opacity: 0.3;
+    pointer-events: none;  /* Optional: Prevent interaction with the faded list */
+}
+
+.overlay {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(220, 31, 31, 0.76);
+    padding: 20px;
+    z-index: 1000;
+    border-radius: 30px;
+}
