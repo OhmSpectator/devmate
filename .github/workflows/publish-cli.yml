@@ -77,6 +77,11 @@ jobs:
         with:
           path: ./artifacts
 
+      - name: Rename Ubuntu to Linux
+        run: |
+          mv ./artifacts/devmatecli-ubuntu-latest ./artifacts/devmatecli-linux-latest
+        shell: bash
+
       - name: Archive Artifacts
         run: |
           tar czvf devmate-cli.tar.gz -C artifacts .
