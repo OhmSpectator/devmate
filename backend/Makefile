@@ -16,7 +16,20 @@ APP_DIR := ./devmateback
 VENV := venv
 INDOCKER_USER := devmate
 
-host-run: venv-check
+
+host-cli-dir-init: venv-check
+	. $(VENV)/bin/activate; \
+	python fetch-cli.py
+	@mkdir -p ./cli-dir
+	@tar xzvf devmate-cli.tar.gz -C ./cli-dir
+	@rm -rf ./devmate-cli.tar.gz
+
+
+host-cli-dir-clean:
+	@rm -rf ./cli-dir
+	@rm -rf ./devmate-cli.tar.gz
+
+host-run: venv-check host-cli-dir-init
 	. $(VENV)/bin/activate; \
 	FLASK_APP=devmateback.app FLASK_ENV=development FLASK_RUN_PORT=$(HOST_PORT) flask run --host=0.0.0.0
 
@@ -29,7 +42,7 @@ host-info:
 host-stop:
 	@-pkill -f "flask run --host=0.0.0.0"
 
-host-clean: host-stop venv-clean
+host-clean: host-stop venv-clean host-cli-dir-clean
 	@rm -rf devices.db
 	@rm -rf devmate.log
 	@rm -rf devmateback/__pycache__

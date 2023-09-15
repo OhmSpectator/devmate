@@ -232,6 +232,52 @@ paths:
               schema:
                 $ref: '#/components/schemas/Message'
 
+  /health:
+    get:
+      summary: "Health check"
+      description: "This endpoint will return a 200 OK response if the API is running."
+      responses:
+        "200":
+          description: "API is running"
+
+  /cli/get:
+    get:
+      summary: "Download Latest CLI Version"
+      description: "This endpoint will return the latest version of the CLI as a binary file."
+      parameters:
+        - name: "platform"
+          in: "query"
+          description: "The platform for which the CLI binary is required."
+          required: true
+          schema:
+            type: "string"
+            enum: [ "linux", "macos", "windows" ]
+      responses:
+        '200':
+          description: "Successful response"
+          content:
+            application/octet-stream:
+              schema:
+                type: "string"
+                format: "binary"
+          headers:
+            Content-Disposition:
+              schema:
+                type: "string"
+              description: "Content-Disposition header ensures proper file naming"
+        '404':
+          description: "CLI version not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: "Bad request, invalid platform."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
 components:
   schemas:
     Message:

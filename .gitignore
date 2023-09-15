@@ -169,3 +169,4 @@ cython_debug/
 **/devices.db
 
 ./backend/db/
+./backend/cli-dir
