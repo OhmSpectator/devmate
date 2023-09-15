@@ -167,3 +167,5 @@ cython_debug/
 
 # devices.db file in all subdirectories
 **/devices.db
+
+./backend/db/
