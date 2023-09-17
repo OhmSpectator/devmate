@@ -43,7 +43,7 @@ const theme = createTheme({
   }
 })
 
-const backendUrl = process.env.REACT_APP_DEVMATE_BACKEND_URL || 'http://localhost:8000';
+const backendPort = process.env.REACT_APP_DEVMATE_BACKEND_PORT || 8888;
 
 
 const App = () => {
@@ -116,8 +116,14 @@ const App = () => {
   };
 
   const handleApiCall = async (endpoint, method, payload) => {
-    const url = `${backendUrl}${endpoint}`
-    return axios({method: method, url: url, data: payload})
+    // Get current domain and protocol
+    const protocol = window.location.protocol;
+    const host = window.location.hostname;
+
+    // Construct API URL
+    const apiUrl = `${protocol}//${host}:${backendPort}${endpoint}`;
+
+    return axios({method: method, url: apiUrl, data: payload})
   };
 
   const handleHealth = async () => {
@@ -125,7 +131,6 @@ const App = () => {
       console.error('An error occurred:', error);
       if (backendAvailable) {
         showSnackbar('Backend is not available.');
-        console.log("Backend URL:", backendUrl);
       }
       setBackendAvailable(false)
     }

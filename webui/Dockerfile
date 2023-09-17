@@ -13,11 +13,11 @@ RUN npm install
 # Copy the local files to the container
 COPY . .
 
-# Set the backend URL as an environment variable
-ARG DEVMATE_BACKEND_URL
+# Declare an ARG for backend port
+ARG DEVMATE_BACKEND_PORT
 
 # Build the application, passing the backend URL as an environment variable
-RUN REACT_APP_DEVMATE_BACKEND_URL=${DEVMATE_BACKEND_URL} npm run build
+RUN REACT_APP_DEVMATE_BACKEND_PORT=${DEVMATE_BACKEND_PORT} npm run build
 
 # Step 2: Serve the React application from Nginx
 FROM nginx:alpine
@@ -29,7 +29,7 @@ COPY --from=build /app/build /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Add a new Nginx configuration file
-COPY nginx.conf /etc/nginx/conf.d
+COPY nginx.conf /etc/nginx/conf.d/nginx.conf
 
 EXPOSE 80
 
