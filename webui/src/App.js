@@ -43,7 +43,8 @@ const theme = createTheme({
   }
 })
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+const backendUrl = process.env.REACT_APP_DEVMATE_BACKEND_URL || 'http://localhost:8000';
+
 
 const App = () => {
   const [devices, setDevices] = useState([]);
@@ -79,10 +80,6 @@ const App = () => {
     }; // Cleanup function
   }, []);
 
-  // Add a function to monitor the backendAvailabe state
-  useEffect(() => {
-    console.log("Dep is triggered... Backend is available: ", backendAvailable);
-  }, [backendAvailable]);
 
   useEffect(() => {
     // Define a single interval ID
@@ -128,6 +125,7 @@ const App = () => {
       console.error('An error occurred:', error);
       if (backendAvailable) {
         showSnackbar('Backend is not available.');
+        console.log("Backend URL:", backendUrl);
       }
       setBackendAvailable(false)
     }

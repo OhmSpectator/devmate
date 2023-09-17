@@ -1,3 +1,4 @@
+include .env
 .PHONY: run stop stop-keep-db build logs clean restart shell status help
 
 # Set default value for DB_DIR and then use it for HOST_DB_DIR
@@ -14,8 +15,8 @@ run: db-dir
 	@which docker-compose >/dev/null 2>&1 || (echo "Error: docker-compose is not installed." && exit 1)
 	@docker-compose up -d
 	@echo "------------------------------------------"
-	@echo "Backend is running at: http://localhost:8000"
-	@echo "Web UI is running at: http://localhost:8080"
+	@echo "Backend is running at: http://localhost:${DEVMATE_BACKEND_PORT}"
+	@echo "Web UI is running at: http://localhost:${DEVMATE_WEBUI_PORT}"
 	@echo "------------------------------------------"
 
 stop:

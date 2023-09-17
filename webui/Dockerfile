@@ -13,8 +13,11 @@ RUN npm install
 # Copy the local files to the container
 COPY . .
 
-# Build the application
-RUN npm run build
+# Set the backend URL as an environment variable
+ARG DEVMATE_BACKEND_URL
+
+# Build the application, passing the backend URL as an environment variable
+RUN REACT_APP_DEVMATE_BACKEND_URL=${DEVMATE_BACKEND_URL} npm run build
 
 # Step 2: Serve the React application from Nginx
 FROM nginx:alpine
