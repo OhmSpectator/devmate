@@ -15,14 +15,15 @@ def download_cli():
         return jsonify({"message": "CLI binary directory doesn't exist!"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
     platform = request.args.get('platform')
+    logger.debug(f"Platform from request: {platform}")
 
     file_name = "devmate"
     if not platform:
+        logger.debug("No platform specified, trying to guess from user agent")
         user_agent = request.headers.get('User-Agent', '').lower()
         platform = None
         if 'windows' in user_agent.lower():
             platform = 'windows'
-            file_name += ".exe"
         elif 'mac' in user_agent.lower():
             platform = 'macos'
         elif 'linux' in user_agent.lower():
@@ -30,6 +31,12 @@ def download_cli():
 
     if platform not in ['linux', 'macos', 'windows']:
         return jsonify({"message": "Invalid platform"}), HTTPStatus.BAD_REQUEST
+
+    if platform == 'windows':
+        file_name += '.exe'
+
+    logger.debug(f"Platform: {platform}")
+    logger.debug(f"File name: {file_name}")
 
     platform_path = f"{cli_dir}/devmatecli-{platform}-latest/"
 

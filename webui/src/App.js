@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 
-import {Box, Snackbar, CssBaseline} from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {Box, CssBaseline, Snackbar} from '@mui/material';
+import {createTheme, ThemeProvider} from '@mui/material/styles';
 
 import axios from 'axios';
 
@@ -9,6 +9,7 @@ import 'moment-duration-format';
 
 import AddDeviceSection from "./AddDeviceSection";
 import DevicesList from "./DevicesList";
+import GetCLISection from "./GetCLISection";
 import {calculateTimeDiff} from "./DeviceRow";
 
 
@@ -53,6 +54,8 @@ const App = () => {
   const [statusMessage, setStatusMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [backendAvailable, setBackendAvailable] = useState(true);
+  const [platform, setPlatform] = useState('');
+
 
   const handleUsernameChange = (event, deviceName) => {
     setDeviceUsernames({
@@ -60,6 +63,21 @@ const App = () => {
       [deviceName]: event.target.value,
     });
   };
+
+  const handlePlatformChange = (event) => {
+    setPlatform(event.target.value);
+  };
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (/windows/.test(userAgent)) {
+      setPlatform('windows');
+    } else if (/macintosh/.test(userAgent)) {
+      setPlatform('macos');
+    } else if (/linux/.test(userAgent)) {
+      setPlatform('linux');
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true; // Flag to prevent state update on an unmounted component
@@ -420,6 +438,20 @@ const App = () => {
     await handleApiCall(`/devices/delete/${deviceName}`, 'delete', null).then(handleSuccess).catch(handleError);
   };
 
+  const handleGetCLI = async () => {
+    const link = document.createElement('a');
+    const protocol = window.location.protocol;
+    const host = window.location.hostname;
+
+    link.href = `${protocol}//${host}:${backendPort}/cli/get?platform=${platform}`;
+    link.setAttribute('download', ''); // this ensures it will download instead of navigate
+    link.style.display = 'none';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
 
   return (
       <Box m={3}>
@@ -451,6 +483,8 @@ const App = () => {
               </div>
           )}
         </div>
+
+        <GetCLISection platformValue={platform} onChange={handlePlatformChange} onClick={handleGetCLI}/>
         <Snackbar
             open={openSnackbar}
             onClose={() => setOpenSnackbar(false)}
