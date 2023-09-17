@@ -1,9 +1,35 @@
 include .env
-.PHONY: run stop stop-keep-db build logs clean restart shell status help
+.PHONY: run stop stop-keep-db build logs clean restart shell status help setup check-python venv-check cli-dir cli-dir-clean db-dir db-clean
 
-# Set default value for DB_DIR and then use it for HOST_DB_DIR
-DB_DIR ?= ./backend/db/
-export HOST_DB_DIR=$(DB_DIR)
+VENV = venv
+PYTHON = python3
+REQUIREMENTS = requirements.txt
+
+check-python:
+	@echo "Checking if Python is installed..."
+	@command -v $(PYTHON) >/dev/null 2>&1 || { echo "Python 3 is not installed. Aborting."; exit 1;}
+
+setup: check-python
+	@echo "Setting up virtual environment..."
+	$(PYTHON) -m venv $(VENV)
+	@echo "Installing requirements..."
+	. $(VENV)/bin/activate; $(PYTHON) -m pip install -r $(REQUIREMENTS)
+	@echo "Setup complete."
+
+venv-check:
+	@if [ ! -d "$(VENV)" ]; then make setup; fi
+
+cli-dir: venv-check
+	@echo "Fetching CLI..."
+	. $(VENV)/bin/activate; $(PYTHON) ./backend/fetch-cli.py
+	@mkdir -p $(HOST_CLI_DIR)
+	@echo tar xzvf devmate-cli.tar.gz -C $(HOST_CLI_DIR)
+	@tar xzvf devmate-cli.tar.gz -C $(HOST_CLI_DIR)
+	@rm -rf ./devmate-cli.tar.gz
+
+
+cli-dir-clean:
+	@rm -rf $(HOST_CLI_DIR)
 
 db-dir:
 	@mkdir -p $(HOST_DB_DIR)
@@ -11,7 +37,8 @@ db-dir:
 db-clean:
 	@rm -rf $(HOST_DB_DIR)
 
-run: db-dir
+
+run: db-dir cli-dir
 	@which docker-compose >/dev/null 2>&1 || (echo "Error: docker-compose is not installed." && exit 1)
 	@docker-compose up -d
 	@echo "------------------------------------------"

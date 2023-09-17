@@ -168,3 +168,5 @@ cython_debug/
 
 ./backend/db/
 ./backend/cli-dir
+./cli-data/
+./db-data/

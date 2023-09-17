@@ -50,7 +50,7 @@ def init_db(app_to_setup):
 
 def init_cli_storage(app_to_setup):
     # Get the path to the CLI binary directory
-    cli_dir = os.environ.get('CLI_DIR', os.path.join(os.getcwd(), 'cli-dir'))
+    cli_dir = os.environ.get('CLI_DIR', os.path.join(os.getcwd(), 'cli-data'))
 
     # Check that the CLI binary directory exists and is writable
     if not os.path.exists(cli_dir):

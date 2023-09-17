@@ -10,13 +10,15 @@ RUN useradd -m ${DEVMATE_USER}
 ENV CUR_WORKDIR /app
 WORKDIR ${CUR_WORKDIR}
 # Set the DB directory, it also used by the application and passed with env variable during the gunicon run
-ENV DB_DIR=${CUR_WORKDIR}/db
+ENV DB_DIR=${CUR_WORKDIR}/db-data
+ENV CLI_DIR=${CUR_WORKDIR}/cli-data
 
 RUN chown -R ${DEVMATE_USER}:${DEVMATE_USER} ${CUR_WORKDIR}
 
 USER ${DEVMATE_USER}
 
 RUN mkdir -p $DB_DIR
+RUN mkdir -p $CLI_DIR
 
 # Add the user's local bin directory to PATH
 ENV PATH="/home/${DEVMATE_USER}/.local/bin:${PATH}"

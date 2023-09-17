@@ -20,8 +20,8 @@ INDOCKER_USER := devmate
 host-cli-dir-init: venv-check
 	. $(VENV)/bin/activate; \
 	python fetch-cli.py
-	@mkdir -p ./cli-dir
-	@tar xzvf devmate-cli.tar.gz -C ./cli-dir
+	@mkdir -p ./cli-data
+	@tar xzvf devmate-cli.tar.gz -C ./cli-data
 	@rm -rf ./devmate-cli.tar.gz
 
 
