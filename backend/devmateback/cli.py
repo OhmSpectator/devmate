@@ -20,13 +20,13 @@ def download_cli():
     if not platform:
         user_agent = request.headers.get('User-Agent', '').lower()
         platform = None
-        if 'windows' in user_agent:
+        if 'windows' in user_agent.lower():
             platform = 'windows'
             file_name += ".exe"
-        elif 'mac' in user_agent:
+        elif 'mac' in user_agent.lower():
             platform = 'macos'
-        elif 'linux' in user_agent:
-            platform = 'ubuntu'
+        elif 'linux' in user_agent.lower():
+            platform = 'linux'
 
     if platform not in ['linux', 'macos', 'windows']:
         return jsonify({"message": "Invalid platform"}), HTTPStatus.BAD_REQUEST
