@@ -1,83 +1,83 @@
 import React from 'react';
 import {Typography, Box, Paper, List, ListItem, ListItemText, IconButton} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import CodeBox from "./CodeBox";
 
 
-const HelpWindow = ({ platform, setShowHelp }) => {
+const Step = ({ title, secondary }) => (
+    <ListItem>
+        <ListItemText primary={title} secondary={secondary} />
+    </ListItem>
+);
+
+const NestedStep = ({ title, secondary }) => (
+    <ListItem>
+        <ListItemText primary={<Typography variant="h8">{title}</Typography>} secondary={secondary} />
+    </ListItem>
+);
+
+const StepWithCode = ({ title, code }) => (
+    <ListItem>
+        <ListItemText
+            primary={title}
+            secondary={
+                <Typography component="div">
+                    <CodeBox code={code} />
+                </Typography>
+            }/>
+    </ListItem>
+);
+
+const HelpWindow = ({ platform, setShowHelp, backendPort }) => {
+
+
     const renderPlatformInstructions = () => {
-        switch (platform) {
-            case 'macos':
-                return (
+        const makeTheBinaryExecutableText = "Make the binary executable";
+        const makeTheBinaryExecutableCode = "chmod +x devmate";
+        const moveTheBinaryText = "Move the binary to a directory in the PATH (optional)";
+        const moveTheBinaryCode = "sudo mv devmate /usr/local/bin/";
+        const setEnvText = "Set the environment variable";
+        const setEnvCode = `export DEVMATE_ADDRESS=${window.location.hostname}\nexport DEVMATE_PORT=${backendPort}`;
+        const runToolText = "Run the tool";
+        const runToolCode = "devmate -h";
+
+        return (
+            <div>
+                {platform === "macos" && (
                     <>
                         <Typography variant="h4" gutterBottom>
                             macOS Installation Steps
                         </Typography>
                         <List>
-                            <ListItem>
-                                <ListItemText primary="Step 1: Make the binary executable"
-                                              secondary={<code>chmod +x devmate</code>}/>
-                            </ListItem>
-                            <ListItem>
-                                <ListItemText primary="Step 2: Move the binary to a directory in the PATH (optional)"
-                                              secondary={<code>sudo mv devmate /usr/local/bin/</code>}/>
-                            </ListItem>
-                            <ListItem>
-                                <ListItemText primary="Step 3: Allow the tool to run"/>
-                            </ListItem>
+                            <StepWithCode title={makeTheBinaryExecutableText} code={makeTheBinaryExecutableCode} />
+                            <StepWithCode title={moveTheBinaryText} code={moveTheBinaryCode} />
+                            <Step title="Allow the tool to run" />
                             <Box ml={5}>
                                 <List component="div" disablePadding>
-                                    <ListItem>
-                                        <ListItemText
-                                            primary={
-                                                <Typography variant="h8">
-                                                    Option 1: Right-click to Open
-                                                </Typography>
-                                            }
-                                            secondary="Right-click on the tool in Finder, select 'Open', and then click 'Open' in the dialog."
-                                        />
-                                    </ListItem>
-                                    <ListItem>
-                                        <ListItemText
-                                            primary={
-                                                <Typography variant="h8">
-                                                    Option 2: Allow in System Preferences
-                                                </Typography>
-                                            }
-                                            secondary="Go to 'System Preferences' > 'Security & Privacy' > 'General' and click 'Open Anyway'."
-                                        />
-                                    </ListItem>
+                                    <NestedStep title="Option 1: Right-click to Open" secondary="Right-click on the tool in Finder, select 'Open', and then click 'Open' in the dialog." />
+                                    <NestedStep title="Option 2: Allow in System Preferences" secondary="Go to 'System Preferences' > 'Security & Privacy' > 'General' and click 'Open Anyway'." />
                                 </List>
                             </Box>
-                            <ListItem>
-                                <ListItemText primary="Step 4: Run the CLI tool" secondary={<code>devmate -h</code>}/>
-                            </ListItem>
+                            <StepWithCode title={setEnvText} code={setEnvCode} />
+                            <StepWithCode title={runToolText} code={runToolCode} />
                         </List>
                     </>
-                );
-            case 'linux':
-                return (
+                )}
+                {platform === "linux" && (
                     <>
                         <Typography variant="h4" gutterBottom>
                             Linux Installation Steps
                         </Typography>
                         <List>
-                            <ListItem>
-                                <ListItemText primary="Step 1: Make the binary executable"
-                                              secondary={<code>chmod +x devmate</code>}/>
-                            </ListItem>
-                            <ListItem>
-                                <ListItemText primary="Step 2: Move the binary to a directory in the PATH (optional)"
-                                              secondary={<code>sudo mv devmate /usr/local/bin/</code>}/>
-                            </ListItem>
-                            <ListItem>
-                                <ListItemText primary="Step 3: Run the CLI tool"
-                                              secondary={<code>devmate -h</code>}/>
-                            </ListItem>
+                            <StepWithCode title={makeTheBinaryExecutableText} code={makeTheBinaryExecutableCode} />
+                            <StepWithCode title={moveTheBinaryText} code={moveTheBinaryCode} />
+                            <StepWithCode title={setEnvText} code={setEnvCode} />
+                            <StepWithCode title={runToolText} code={runToolCode} />
                         </List>
-                    </> );
-            default:
-                return null;
-        }
+                    </>
+                )}
+            </div>
+        );
     };
 
     return (

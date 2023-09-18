@@ -10,7 +10,6 @@ import 'moment-duration-format';
 import AddDeviceSection from "./AddDeviceSection";
 import DevicesList from "./DevicesList";
 import GetCLISection from "./GetCLISection";
-import HelpWindow from "./HelpWindow";
 import {calculateTimeDiff} from "./DeviceRow";
 
 
@@ -492,6 +491,7 @@ const App = () => {
             onClick={handleGetCLI}
             showHelp={showHelp}
             setShowHelp={setShowHelp}
+            backendPort={backendPort}
         />
         <Snackbar
             open={openSnackbar}
