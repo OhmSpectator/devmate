@@ -1,7 +1,8 @@
 import {Box, Button, FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 import React from "react";
+import HelpWindow from "./HelpWindow";
 
-const GetCLISection = ({platformValue, onChange, onClick}) => {
+const GetCLISection = ({platformValue, onChange, onClick, showHelp, setShowHelp}) => {
     return <Box
         position={"absolute"}
         right={16}
@@ -31,6 +32,7 @@ const GetCLISection = ({platformValue, onChange, onClick}) => {
         >
             Get CLI
         </Button>
+        {showHelp && <HelpWindow platform={platformValue} setShowHelp={setShowHelp}/>}
     </Box>;
 }
 

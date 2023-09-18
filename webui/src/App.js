@@ -10,6 +10,7 @@ import 'moment-duration-format';
 import AddDeviceSection from "./AddDeviceSection";
 import DevicesList from "./DevicesList";
 import GetCLISection from "./GetCLISection";
+import HelpWindow from "./HelpWindow";
 import {calculateTimeDiff} from "./DeviceRow";
 
 
@@ -55,6 +56,7 @@ const App = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [backendAvailable, setBackendAvailable] = useState(true);
   const [platform, setPlatform] = useState('');
+  const [showHelp, setShowHelp] = useState(false);
 
 
   const handleUsernameChange = (event, deviceName) => {
@@ -439,6 +441,7 @@ const App = () => {
   };
 
   const handleGetCLI = async () => {
+    setShowHelp(true);
     const link = document.createElement('a');
     const protocol = window.location.protocol;
     const host = window.location.hostname;
@@ -483,8 +486,13 @@ const App = () => {
               </div>
           )}
         </div>
-
-        <GetCLISection platformValue={platform} onChange={handlePlatformChange} onClick={handleGetCLI}/>
+        <GetCLISection
+            platformValue={platform}
+            onChange={handlePlatformChange}
+            onClick={handleGetCLI}
+            showHelp={showHelp}
+            setShowHelp={setShowHelp}
+        />
         <Snackbar
             open={openSnackbar}
             onClose={() => setOpenSnackbar(false)}
