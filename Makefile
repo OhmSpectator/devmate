@@ -38,6 +38,8 @@ db-clean:
 	@rm -rf $(HOST_DB_DIR)
 
 
+update-cli: cli-dir-clean cli-dir
+
 run: db-dir cli-dir
 	@which docker-compose >/dev/null 2>&1 || (echo "Error: docker-compose is not installed." && exit 1)
 	@docker-compose up -d
