@@ -7,7 +7,10 @@ const ReserveGroup = ({device, handleUsernameChange, deviceUsernames, handleRese
             <Grid container alignItems="center">
                 <Grid item xs={6}>
                     {device.status === 'free' ? (
-                        <TextField label="Username" onChange={(event) => handleUsernameChange(event, device.name)}/>
+                        <TextField label="Username"
+                                   onChange={(event) => handleUsernameChange(event, device.name)}
+                                   style={{zIndex: 0}}
+                        />
                     ) : (
                         device.user
                     )}

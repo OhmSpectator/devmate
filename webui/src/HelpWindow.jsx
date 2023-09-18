@@ -88,7 +88,9 @@ const HelpWindow = ({ platform, setShowHelp, backendPort }) => {
             position: 'fixed',
             top: '50%',
             left: '50%',
-            transform: 'translate(-50%, -50%)'
+            transform: 'translate(-50%, -50%)',
+            zIndex: 999,
+            backgroundColor: '#333a3d'
         }}
         >
             <IconButton onClick={() => setShowHelp(false)} style={{ position: 'absolute', right: '10px', top: '10px' }}>
