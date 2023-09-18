@@ -5,6 +5,17 @@ VENV = venv
 PYTHON = python3
 REQUIREMENTS = requirements.txt
 
+COMPOSE_FILE = docker-compose.yml
+PROTO="http"
+
+# Check if SSL certificates exist
+SSL_MODE ?= $(shell if [ -f ./backend/certs/server.key ] && [ -f ./backend/certs/server.cert ] && [ -f ./webui/certs/server.key ] && [ -f ./webui/certs/server.cert ]; then echo "true"; else echo "false"; fi)
+
+ifeq ($(SSL_MODE), true)
+  COMPOSE_FILE = docker-compose-ssl.yml
+  PROTO="https"
+endif
+
 check-python:
 	@echo "Checking if Python is installed..."
 	@command -v $(PYTHON) >/dev/null 2>&1 || { echo "Python 3 is not installed. Aborting."; exit 1;}
@@ -42,11 +53,12 @@ update-cli: cli-dir-clean cli-dir
 
 run: db-dir cli-dir
 	@which docker-compose >/dev/null 2>&1 || (echo "Error: docker-compose is not installed." && exit 1)
-	@docker-compose up -d
+	@docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "------------------------------------------"
-	@echo "Backend is running at: http://localhost:${DEVMATE_BACKEND_PORT}"
-	@echo "Web UI is running at: http://localhost:${DEVMATE_WEBUI_PORT}"
+	@echo "Backend is running at: $(PROTO)://localhost:${DEVMATE_BACKEND_PORT}"
+	@echo "Web UI is running at: $(PROTO)://localhost:${DEVMATE_WEBUI_PORT}"
 	@echo "------------------------------------------"
+
 
 stop:
 	@docker-compose down
@@ -71,6 +83,13 @@ restart: stop run
 
 status:
 	@docker-compose ps
+
+certs-gen:
+	@echo "Generating SSL certificates..."
+	@mkdir -p ./backend/certs
+	@mkdir -p ./webui/certs
+	@openssl req -x509 -newkey rsa:4096 -keyout ./backend/certs/server.key -out ./backend/certs/server.cert -days 365 -nodes -subj "/C=DE/ST=Berlin/L=Berlin/O=Zededa Germany GmbH/CN=localhost"
+	@openssl req -x509 -newkey rsa:4096 -keyout ./webui/certs/server.key -out ./webui/certs/server.cert -days 365 -nodes -subj "/C=DE/ST=Berlin/L=Berlin/O=Zededa Germany GmbH/CN=localhost"
 
 help:
 	@echo "Available targets:"

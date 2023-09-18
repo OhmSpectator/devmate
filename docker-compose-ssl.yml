@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  devmate-webui:  # frontend service
+    build:
+      context: ./webui
+      dockerfile: Dockerfile-ssl
+      args:
+        - DEVMATE_BACKEND_PORT=${DEVMATE_BACKEND_PORT}
+    ports:
+      - "${DEVMATE_WEBUI_PORT}:443"
+    depends_on:
+      - devmate-backend
+
+  devmate-backend:  # backend service
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-ssl
+      args:
+        - GIT_REMOTE_URL=${GIT_REMOTE_URL}
+    ports:
+      - "${DEVMATE_BACKEND_PORT}:8080"
+    volumes:
+      - ${HOST_DB_DIR}:/app/db-data
+      - ${HOST_CLI_DIR}:/app/cli-data
+
+volumes:
+    db-data:
+    cli-data:
