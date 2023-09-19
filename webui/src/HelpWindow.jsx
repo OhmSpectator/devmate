@@ -36,10 +36,8 @@ const HelpWindow = ({ platform, setShowHelp, backendPort }) => {
         const makeTheBinaryExecutableCode = "chmod +x devmate";
         const moveTheBinaryText = "Move the binary to a directory in the PATH (optional)";
         const moveTheBinaryCode = "sudo mv devmate /usr/local/bin/";
-        const setEnvText = "Set the environment variable";
-        const setEnvCode = `export DEVMATE_ADDRESS=${window.location.hostname}\nexport DEVMATE_PORT=${backendPort}`;
-        const runToolText = "Run the tool";
-        const runToolCode = "devmate -h";
+        const runToolText = "Configure the tool";
+        const runToolCode = `devmate configure --protocol ${window.location.protocol.split(":")[0]} --address ${window.location.hostname} --port ${backendPort}`;
 
         return (
             <div>
@@ -58,7 +56,6 @@ const HelpWindow = ({ platform, setShowHelp, backendPort }) => {
                                     <NestedStep title="Option 2: Allow in System Preferences" secondary="Go to 'System Preferences' > 'Security & Privacy' > 'General' and click 'Open Anyway'." />
                                 </List>
                             </Box>
-                            <StepWithCode title={setEnvText} code={setEnvCode} />
                             <StepWithCode title={runToolText} code={runToolCode} />
                         </List>
                     </>
@@ -71,7 +68,16 @@ const HelpWindow = ({ platform, setShowHelp, backendPort }) => {
                         <List>
                             <StepWithCode title={makeTheBinaryExecutableText} code={makeTheBinaryExecutableCode} />
                             <StepWithCode title={moveTheBinaryText} code={moveTheBinaryCode} />
-                            <StepWithCode title={setEnvText} code={setEnvCode} />
+                            <StepWithCode title={runToolText} code={runToolCode} />
+                        </List>
+                    </>
+                )}
+                {platform === "windows" && (
+                    <>
+                        <Typography variant="h4" gutterBottom>
+                            Windows Installation Steps
+                        </Typography>
+                        <List>
                             <StepWithCode title={runToolText} code={runToolCode} />
                         </List>
                     </>
@@ -81,7 +87,6 @@ const HelpWindow = ({ platform, setShowHelp, backendPort }) => {
     };
 
     return (
-        platform !== 'windows' &&
         <Paper style={{
             padding: '20px',
             maxWidth: '600px',
