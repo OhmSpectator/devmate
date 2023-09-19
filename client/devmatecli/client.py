@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import requests
 import sys
@@ -6,10 +7,54 @@ from datetime import datetime, timezone
 import humanize
 from prettytable import PrettyTable
 
-DEVMATE_ADDRESS = os.environ.get('DEVMATE_ADDRESS', 'devmate.zededa.net')
-DEVMATE_PORT = os.environ.get('DEVMATE_PORT', '8000')
 
-BASE_URL = f"http://{DEVMATE_ADDRESS}:{DEVMATE_PORT}"
+# Class to handle the server address and port
+class DevmateServer(object):
+    def __init__(self, address, port):
+        self.address = address if address else os.environ.get('DEVMATE_ADDRESS', 'localhost')
+        self.port = port if port else os.environ.get('DEVMATE_PORT', '8080')
+        self.protocol = os.environ.get('DEVMATE_PROTOCOL', 'http')
+
+    @property
+    def base_url(self):
+        return f"{self.protocol}://{self.address}:{self.port}"
+
+
+devmate_server = DevmateServer(None, None)
+
+
+def save_config(protocol, addr, port):
+    config_path = get_config_path()
+    with open(config_path, 'w') as f:
+        json.dump({'address': addr, 'port': port, 'protocol': protocol}, f)
+
+
+def load_config():
+    config_path = get_config_path()
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+            devmate_server.address = config.get('address')
+            devmate_server.port = config.get('port')
+            devmate_server.protocol = config.get('protocol')
+            return True
+    return None
+
+
+def get_config_path():
+    home = os.path.expanduser("~")
+    config_folder = ".devmateconfg"
+    if os.name == 'nt':  # For Windows
+        config_folder = "devmateconfg"
+    config_path = os.path.join(home, config_folder, 'config.json')
+    if not os.path.exists(os.path.dirname(config_path)):
+        os.makedirs(os.path.dirname(config_path))
+    return config_path
+
+
+def configure(protocol, address, port):
+    save_config(protocol, address, port)
+    print(f"Configuration saved. Port: {protocol}, Address: {address}, Port: {port}")
 
 
 def handle_unexpected_status(response):
@@ -18,7 +63,7 @@ def handle_unexpected_status(response):
 
 def check_server_accessibility():
     try:
-        response = requests.get(f"{BASE_URL}/health")
+        response = requests.get(f"{devmate_server.base_url}/health")
         if response.status_code != 200:
             # Check that it's not one of 5** errors
             if response.status_code // 100 == 5:
@@ -37,7 +82,7 @@ def datetime_now():
 
 
 def list_devices():
-    response = requests.get(f"{BASE_URL}/devices/list")
+    response = requests.get(f"{devmate_server.base_url}/devices/list")
     if response.status_code == 200:
         devices = response.json().get('devices', [])
 
@@ -73,7 +118,7 @@ def list_devices():
 
 def reserve_device(device_name, username):
     payload = {'device': device_name, 'username': username}
-    response = requests.post(f"{BASE_URL}/devices/reserve", json=payload)
+    response = requests.post(f"{devmate_server.base_url}/devices/reserve", json=payload)
     if response.status_code == 200:
         print("Device successfully reserved.")
     elif response.status_code == 409:
@@ -88,7 +133,7 @@ def reserve_device(device_name, username):
 
 def release_device(device_name):
     payload = {'device': device_name}
-    response = requests.post(f"{BASE_URL}/devices/release", json=payload)
+    response = requests.post(f"{devmate_server.base_url}/devices/release", json=payload)
     if response.status_code == 200:
         print("Device successfully released.")
     elif response.status_code == 304:
@@ -103,7 +148,7 @@ def release_device(device_name):
 
 def add_device(device_name, model):
     payload = {'device': device_name, 'model': model}
-    response = requests.post(f"{BASE_URL}/devices/add", json=payload)
+    response = requests.post(f"{devmate_server.base_url}/devices/add", json=payload)
     if response.status_code == 201:
         print("Device successfully added.")
     elif response.status_code == 409:
@@ -116,7 +161,7 @@ def add_device(device_name, model):
 
 def set_device_offline(device_name):
     payload = {'device': device_name}
-    response = requests.post(f"{BASE_URL}/devices/offline", json=payload)
+    response = requests.post(f"{devmate_server.base_url}/devices/offline", json=payload)
     if response.status_code == 200:
         print("Device successfully set to offline.")
     elif response.status_code == 304:
@@ -131,7 +176,7 @@ def set_device_offline(device_name):
 
 def set_device_online(device_name):
     payload = {'device': device_name}
-    response = requests.post(f"{BASE_URL}/devices/online", json=payload)
+    response = requests.post(f"{devmate_server.base_url}/devices/online", json=payload)
     if response.status_code == 200:
         print("Device successfully set to online.")
     elif response.status_code == 304:
@@ -145,7 +190,7 @@ def set_device_online(device_name):
 
 
 def delete_device(device_name):
-    response = requests.delete(f"{BASE_URL}/devices/delete/{device_name}")
+    response = requests.delete(f"{devmate_server.base_url}/devices/delete/{device_name}")
     if response.status_code == 204:
         print("Device successfully deleted.")
     elif response.status_code == 404:
@@ -157,10 +202,6 @@ def delete_device(device_name):
 
 
 def main():
-    if not check_server_accessibility():
-        print("Server is not accessible. Please check your connection and try again.")
-        sys.exit(1)
-
     parser = argparse.ArgumentParser(description="Device Management CLI")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -194,11 +235,27 @@ def main():
     # Delete Device
     delete_parser = subparsers.add_parser("delete", help="Delete a device")
     delete_parser.add_argument("device", help="Name of the device to delete")
+    
+    config_parser = subparsers.add_parser('configure', help='Configure server address and port')
+    config_parser.add_argument('--protocol', required=True, help='Server protocol (http or https)')
+    config_parser.add_argument('--address', required=True, help='Server address')
+    config_parser.add_argument('--port', required=True, help='Server port')
 
     args = parser.parse_args()
 
     if args.command is None:
         parser.print_help()
+        sys.exit(1)
+
+    if args.command == 'configure':
+        configure(args.protocol, args.address, args.port)
+
+    if not load_config():
+        print("Server protocol, address, and port are not configured. Please run 'devmate configure' first.")
+        sys.exit(1)
+
+    if not check_server_accessibility():
+        print("Server is not accessible. Please check your connection and try again.")
         sys.exit(1)
 
     if args.command == "list":
