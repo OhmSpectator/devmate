@@ -1,5 +1,5 @@
 include .env
-.PHONY: run stop stop-keep-db build logs clean restart shell status help setup check-python venv-check cli-dir cli-dir-clean db-dir db-clean
+.PHONY: run stop build logs clean restart status help setup check-python venv-check cli-dir cli-dir-clean db-dir db-clean update-cli distclean certs-gen
 
 VENV = venv
 PYTHON = python3
@@ -29,6 +29,9 @@ setup: check-python
 
 venv-check:
 	@if [ ! -d "$(VENV)" ]; then make setup; fi
+
+venv-clean:
+	@rm -rf $(VENV)
 
 cli-dir: venv-check
 	@echo "Fetching CLI..."
@@ -63,21 +66,18 @@ run: db-dir cli-dir
 stop:
 	@docker-compose down
 
-stop-keep-db:
-	@docker-compose down --remove-orphans
-
 build:
 	@docker-compose build
 
-logs:
-	@docker-compose logs -f
+devmate-log:
+	@echo "Checking if devmate_devmate-backend_1 is running..."
+	@docker ps --filter "name=devmate_devmate-backend_1" --format "{{.Names}}" | grep -q "devmate_devmate-backend_1" || (echo "Container is not running. Aborting." && exit 1)
+	@docker exec -it devmate_devmate-backend_1 tail -f /app/devmate.log
 
 clean:
-	@docker-compose down -v
-
-clean-all:
 	@docker-compose down --rmi all -v
 
+distclean: clean venv-clean cli-dir-clean db-clean
 
 restart: stop run
 
@@ -95,11 +95,12 @@ help:
 	@echo "Available targets:"
 	@echo "  run          - Start all services"
 	@echo "  stop         - Stop all services and remove volumes"
-	@echo "  stop-keep-db - Stop all services but keep the database volume"
 	@echo "  build        - Build the services"
-	@echo "  logs         - Tail logs for all services"
 	@echo "  clean        - Remove all persistent data"
 	@echo "  clean-all    - Remove all persistent data and images"
 	@echo "  restart      - Restart all services"
 	@echo "  status       - Display service status"
+	@echo "  certs-gen    - Generate SSL certificates"
+	@echo "  devmate-log  - Tail logs for devmate backend service"
 	@echo "  help         - Show this help message"
+
