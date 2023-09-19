@@ -40,7 +40,7 @@ cli-dir: venv-check
 
 
 cli-dir-clean:
-	@rm -rf $(HOST_CLI_DIR)
+	@rm -rf $(HOST_CLI_DIR)/*
 
 db-dir:
 	@mkdir -p $(HOST_DB_DIR)
