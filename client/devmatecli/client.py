@@ -202,44 +202,72 @@ def delete_device(device_name):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Device Management CLI")
+    parser = argparse.ArgumentParser(
+        description="Device Management CLI: A tool for managing, reserving, and monitoring devices."
+    )
+    subparsers = parser.add_subparsers(
+        dest="command",
+        help="Available commands. Use '<command> --help' for more information on each command."
+    )
 
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    list_parser = subparsers.add_parser(
+        "list",
+        help="Lists all available and reserved devices.",
+        usage="list"
+    )
 
-    # List Devices
-    list_parser = subparsers.add_parser("list", help="List all devices")
+    reserve_parser = subparsers.add_parser(
+        "reserve",
+        help="Reserve a device for use.",
+        usage="reserve <device> [--user]",
+    )
+    reserve_parser.add_argument("device")
+    reserve_parser.add_argument("--user", default=os.getlogin())
 
-    # Reserve Device
-    reserve_parser = subparsers.add_parser("reserve", help="Reserve a device")
-    reserve_parser.add_argument("device", help="Name of the device to reserve")
-    # Set the default value for --user to the current username
-    reserve_parser.add_argument("--user", default=os.getlogin(), help="Username of the user reserving the device")
+    release_parser = subparsers.add_parser(
+        "release",
+        help="Release a previously reserved device.",
+        usage="release <device>"
+    )
+    release_parser.add_argument("device")
 
-    # Release Device
-    release_parser = subparsers.add_parser("release", help="Release a reserved device")
-    release_parser.add_argument("device", help="Name of the device to release")
+    add_parser = subparsers.add_parser(
+        "add",
+        help="Add a new device to the management system.",
+        usage="add <device> --model"
+    )
+    add_parser.add_argument("device")
+    add_parser.add_argument("--model", required=True)
 
-    # Add Device
-    add_parser = subparsers.add_parser("add", help="Add a new device")
-    add_parser.add_argument("device", help="Name of the new device")
-    add_parser.add_argument("--model", required=True, help="Model of the new device")
+    offline_parser = subparsers.add_parser(
+        "offline",
+        help="offline <device>. Set a device to offline mode.",
+        usage="offline <device>"
+    )
+    offline_parser.add_argument("device")
 
-    # Set Device to Offline
-    offline_parser = subparsers.add_parser("offline", help="Set a device to offline mode")
-    offline_parser.add_argument("device", help="Name of the device to set to offline")
+    online_parser = subparsers.add_parser(
+        "online",
+        help="Set an offline device back to available mode.",
+        usage="online <device>"
+    )
+    online_parser.add_argument("device")
 
-    # Return Device from Offline
-    online_parser = subparsers.add_parser("online", help="Set a device back to free")
-    online_parser.add_argument("device", help="Name of the device to set to available")
+    delete_parser = subparsers.add_parser(
+        "delete",
+        help="Permanently remove a device from the management system.",
+        usage="delete <device>"
+    )
+    delete_parser.add_argument("device")
 
-    # Delete Device
-    delete_parser = subparsers.add_parser("delete", help="Delete a device")
-    delete_parser.add_argument("device", help="Name of the device to delete")
-    
-    config_parser = subparsers.add_parser('configure', help='Configure server address and port')
-    config_parser.add_argument('--protocol', required=True, help='Server protocol (http or https)')
-    config_parser.add_argument('--address', required=True, help='Server address')
-    config_parser.add_argument('--port', required=True, help='Server port')
+    config_parser = subparsers.add_parser(
+        'configure',
+        help='Configure the server protocol, address, and port. Must be run before using other commands.',
+        usage='configure --protocol --address --port'
+    )
+    config_parser.add_argument('--protocol', required=True)
+    config_parser.add_argument('--address', required=True)
+    config_parser.add_argument('--port', required=True)
 
     args = parser.parse_args()
 
