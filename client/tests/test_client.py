@@ -41,7 +41,13 @@ class TestListDevices(unittest.TestCase):
         mock_get.return_value.status_code = HTTPStatus.OK
         mock_get.return_value.json.return_value = {'devices': [{'name': 'Device1', 'model': 'Model1', 'status': 'free'}]}
         device_management.list_devices()
-        expected_output = "Found 1 device:\n    Device1 (Model1) is free\n"
+        expected_output = (
+            "+---------+--------+--------+-------------+-------------+--------------+\n"
+            "|   Name  | Model  | Status | Reserved By | Reserved At | Reserved For |\n"
+            "+---------+--------+--------+-------------+-------------+--------------+\n"
+            "| Device1 | Model1 |  free  |             |             |              |\n"
+            "+---------+--------+--------+-------------+-------------+--------------+\n"
+        )
         self.assertEqual(mock_stdout.getvalue(), expected_output)
 
     @patch('requests.get')
@@ -65,9 +71,13 @@ class TestListDevices(unittest.TestCase):
             ]
         }
         device_management.list_devices()
-
-        # Match the output including the date and duration strings
-        expected_output = "Found 1 device:\n    Device1 (Model1) is reserved by User1 01.01.2021 01:00:00 (an hour by now)\n"
+        expected_output = (
+            "+---------+--------+----------+-------------+---------------------+----------------+\n"
+            "|   Name  | Model  |  Status  | Reserved By |     Reserved At     |  Reserved For  |\n"
+            "+---------+--------+----------+-------------+---------------------+----------------+\n"
+            "| Device1 | Model1 | reserved |    User1    | 01.01.2021 01:00:00 | an hour by now |\n"
+            "+---------+--------+----------+-------------+---------------------+----------------+\n"
+        )
         self.assertEqual(mock_stdout.getvalue(), expected_output)
 
     @patch('requests.get')

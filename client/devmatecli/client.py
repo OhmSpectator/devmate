@@ -4,6 +4,7 @@ import requests
 import sys
 from datetime import datetime, timezone
 import humanize
+from prettytable import PrettyTable
 
 DEVMATE_ADDRESS = os.environ.get('DEVMATE_ADDRESS', 'devmate.zededa.net')
 DEVMATE_PORT = os.environ.get('DEVMATE_PORT', '8000')
@@ -39,10 +40,16 @@ def list_devices():
     response = requests.get(f"{BASE_URL}/devices/list")
     if response.status_code == 200:
         devices = response.json().get('devices', [])
-        print(f"Found {len(devices)} device{'s' if len(devices) != 1 else ''}:")
+
+        # Create a table object
+        table = PrettyTable()
+        table.field_names = ["Name", "Model", "Status", "Reserved By", "Reserved At", "Reserved For"]
+
         for device in devices:
             status = device.get('status')
             reserved_by = device.get('user')
+            reserved_at = ""
+            reserved_for = ""
             if status == 'reserved' and reserved_by:
                 # Assuming that the reservation time is in UTC
                 utc_time = datetime.fromisoformat(device.get('reservation_time')).replace(tzinfo=timezone.utc)
@@ -52,10 +59,12 @@ def list_devices():
                 reserved_at = local_time.strftime("%d.%m.%Y %H:%M:%S")
                 # For how long the device is reserved
                 reserved_for = datetime_now() - utc_time
-                reserved_for = humanize.naturaldelta(reserved_for)
-                print(f"    {device.get('name')} ({device.get('model')}) is {status} by {reserved_by} {reserved_at} ({reserved_for} by now)")
-            else:
-                print(f"    {device.get('name')} ({device.get('model')}) is {status}")
+                reserved_for = humanize.naturaldelta(reserved_for) + " by now"
+
+            table.add_row(
+                [device.get('name'), device.get('model'), status, reserved_by or "", reserved_at, reserved_for])
+
+        print(table)
     elif response.status_code == 204:
         print("No devices found.")
     else:
