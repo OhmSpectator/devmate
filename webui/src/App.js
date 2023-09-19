@@ -441,17 +441,6 @@ const App = () => {
 
   const handleGetCLI = async () => {
     setShowHelp(true);
-    const link = document.createElement('a');
-    const protocol = window.location.protocol;
-    const host = window.location.hostname;
-
-    link.href = `${protocol}//${host}:${backendPort}/cli/get?platform=${platform}`;
-    link.setAttribute('download', ''); // this ensures it will download instead of navigate
-    link.style.display = 'none';
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   }
 
 
