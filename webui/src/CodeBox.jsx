@@ -2,6 +2,8 @@ import {IconButton, Paper, Typography} from "@mui/material";
 import {useState} from "react";
 import {useEffect} from "react";
 
+const isSecured = window.location.protocol === "https:" || window.location.hostname === "localhost";
+
 export const CodeBox = ({code}) => {
 
     const [copyStatus, setCopyStatus] = useState("copy");
@@ -48,7 +50,7 @@ export const CodeBox = ({code}) => {
 
     return (
         <Paper elevation={2} style={codeContainerStyle}>
-            <IconButton
+            {isSecured && ( <IconButton
                 aria-label="copy"
                 size="small"
                 onClick={handleCopyClick}
@@ -56,6 +58,7 @@ export const CodeBox = ({code}) => {
             >
                 <Typography variant="caption">{copyStatus}</Typography>
             </IconButton>
+            )}
             <div style={{overflowX: "auto"}}>
             <pre>
                 <code>{code}</code>
