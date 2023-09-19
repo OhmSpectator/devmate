@@ -4,7 +4,7 @@ import HelpWindow from "./HelpWindow";
 
 const GetCLISection = ({platformValue, onChange, onClick, showHelp, setShowHelp, backendPort}) => {
     return <Box
-        position={"absolute"}
+        position={"fixed"}
         right={16}
         bottom={16}
         display="flex"

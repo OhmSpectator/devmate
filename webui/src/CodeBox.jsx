@@ -56,9 +56,11 @@ export const CodeBox = ({code}) => {
             >
                 <Typography variant="caption">{copyStatus}</Typography>
             </IconButton>
+            <div style={{overflowX: "auto"}}>
             <pre>
                 <code>{code}</code>
             </pre>
+            </div>
         </Paper>
     );
 }
