@@ -48,14 +48,8 @@ const HelpWindow = ({ platform, setShowHelp, backendPort }) => {
                         </Typography>
                         <List>
                             <StepWithCode title={makeTheBinaryExecutableText} code={makeTheBinaryExecutableCode} />
+                            <StepWithCode title={"Remove the quarantine flag"} code={"xattr -d com.apple.quarantine devmate"} />
                             <StepWithCode title={moveTheBinaryText} code={moveTheBinaryCode} />
-                            <Step title="Allow the tool to run" />
-                            <Box ml={5}>
-                                <List component="div" disablePadding>
-                                    <NestedStep title="Option 1: Right-click to Open" secondary="Right-click on the tool in Finder, select 'Open', and then click 'Open' in the dialog." />
-                                    <NestedStep title="Option 2: Allow in System Preferences" secondary="Go to 'System Preferences' > 'Security & Privacy' > 'General' and click 'Open Anyway'." />
-                                </List>
-                            </Box>
                             <StepWithCode title={runToolText} code={runToolCode} />
                         </List>
                     </>
