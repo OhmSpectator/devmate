@@ -8,7 +8,7 @@ services:
       args:
         - DEVMATE_BACKEND_PORT=${DEVMATE_BACKEND_PORT}
     ports:
-      - "${DEVMATE_WEBUI_PORT}:443"
+      - "${DEVMATE_WEBUI_SSL_PORT}:443"
     depends_on:
       - devmate-backend
 

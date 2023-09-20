@@ -6,6 +6,7 @@ PYTHON = python3
 REQUIREMENTS = requirements.txt
 
 COMPOSE_FILE = docker-compose.yml
+WEBUI_PORT = $(DEVMATE_WEBUI_PORT)
 PROTO="http"
 
 # Check if SSL certificates exist
@@ -14,6 +15,7 @@ SSL_MODE ?= $(shell if [ -f ./backend/certs/server.key ] && [ -f ./backend/certs
 ifeq ($(SSL_MODE), true)
   COMPOSE_FILE = docker-compose-ssl.yml
   PROTO="https"
+  WEBUI_PORT = $(DEVMATE_WEBUI_SSL_PORT)
 endif
 
 check-python:
@@ -59,7 +61,7 @@ run: db-dir cli-dir
 	@docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "------------------------------------------"
 	@echo "Backend is running at: $(PROTO)://localhost:${DEVMATE_BACKEND_PORT}"
-	@echo "Web UI is running at: $(PROTO)://localhost:${DEVMATE_WEBUI_PORT}"
+	@echo "Web UI is running at: $(PROTO)://localhost:${WEBUI_PORT}"
 	@echo "------------------------------------------"
 
 
