@@ -14,8 +14,6 @@ services:
   devmate-backend:  # backend service
     build:
       context: ./backend
-      args:
-        - GIT_REMOTE_URL=${GIT_REMOTE_URL}
     ports:
       - "${DEVMATE_BACKEND_PORT}:8000"
     volumes:
