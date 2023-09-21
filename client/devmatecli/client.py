@@ -6,6 +6,8 @@ import sys
 from datetime import datetime, timezone
 import humanize
 from prettytable import PrettyTable
+import warnings
+import urllib3
 
 
 # Class to handle the server address and port
@@ -61,9 +63,24 @@ def handle_unexpected_status(response):
     print(f"Unexpected status code {response.status_code}")
 
 
+def do_api_call(method, endpoint, payload=None):
+    warnings.filterwarnings("ignore", category=urllib3.exceptions.InsecureRequestWarning)
+    try:
+        if method == 'get':
+            return requests.get(f"{devmate_server.base_url}/{endpoint}", verify=False)
+        elif method == 'post':
+            return requests.post(f"{devmate_server.base_url}/{endpoint}", json=payload, verify=False)
+        elif method == 'delete':
+            return requests.delete(f"{devmate_server.base_url}/{endpoint}", verify=False)
+        else:
+            raise ValueError(f"Invalid method {method}")
+    finally:
+        warnings.resetwarnings()
+
+
 def check_server_accessibility():
     try:
-        response = requests.get(f"{devmate_server.base_url}/health")
+        response = do_api_call('get', 'health')
         if response.status_code != 200:
             # Check that it's not one of 5** errors
             if response.status_code // 100 == 5:
@@ -82,7 +99,7 @@ def datetime_now():
 
 
 def list_devices():
-    response = requests.get(f"{devmate_server.base_url}/devices/list")
+    response = do_api_call('get', 'devices/list')
     if response.status_code == 200:
         devices = response.json().get('devices', [])
 
@@ -118,7 +135,7 @@ def list_devices():
 
 def reserve_device(device_name, username):
     payload = {'device': device_name, 'username': username}
-    response = requests.post(f"{devmate_server.base_url}/devices/reserve", json=payload)
+    response = do_api_call('post', 'devices/reserve', payload=payload)
     if response.status_code == 200:
         print("Device successfully reserved.")
     elif response.status_code == 409:
@@ -133,7 +150,7 @@ def reserve_device(device_name, username):
 
 def release_device(device_name):
     payload = {'device': device_name}
-    response = requests.post(f"{devmate_server.base_url}/devices/release", json=payload)
+    response = do_api_call('post', 'devices/release', payload=payload)
     if response.status_code == 200:
         print("Device successfully released.")
     elif response.status_code == 304:
@@ -148,7 +165,7 @@ def release_device(device_name):
 
 def add_device(device_name, model):
     payload = {'device': device_name, 'model': model}
-    response = requests.post(f"{devmate_server.base_url}/devices/add", json=payload)
+    response = do_api_call('post', 'devices/add', payload=payload)
     if response.status_code == 201:
         print("Device successfully added.")
     elif response.status_code == 409:
@@ -161,7 +178,7 @@ def add_device(device_name, model):
 
 def set_device_offline(device_name):
     payload = {'device': device_name}
-    response = requests.post(f"{devmate_server.base_url}/devices/offline", json=payload)
+    response = do_api_call('post', 'devices/offline', payload=payload)
     if response.status_code == 200:
         print("Device successfully set to offline.")
     elif response.status_code == 304:
@@ -176,7 +193,7 @@ def set_device_offline(device_name):
 
 def set_device_online(device_name):
     payload = {'device': device_name}
-    response = requests.post(f"{devmate_server.base_url}/devices/online", json=payload)
+    response = do_api_call('post', 'devices/online', payload=payload)
     if response.status_code == 200:
         print("Device successfully set to online.")
     elif response.status_code == 304:
@@ -190,7 +207,7 @@ def set_device_online(device_name):
 
 
 def delete_device(device_name):
-    response = requests.delete(f"{devmate_server.base_url}/devices/delete/{device_name}")
+    response = do_api_call('delete', f'devices/delete/{device_name}')
     if response.status_code == 204:
         print("Device successfully deleted.")
     elif response.status_code == 404:
