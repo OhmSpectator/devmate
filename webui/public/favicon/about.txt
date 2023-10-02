@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Akatab
+- Font Author: Copyright (c) 2010-2023, SIL International (https://scripts.sil.org), with Reserved Font Name "Akatab", copyright 2010-2019 Adobe (http://www.adobe.com/), with Reserved Font Name "Source" (Latin glyphs).
+- Font Source: http://fonts.gstatic.com/s/akatab/v7/VuJwdNrK3Z7gqJEPWIz5NIh-YA.ttf
+- Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))
