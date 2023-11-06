@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    name: Build CLI
+    name: run codecov
     runs-on: ubuntu-latest
     steps:
       - name: Upload coverage reports to Codecov
