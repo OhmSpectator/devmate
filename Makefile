@@ -69,7 +69,7 @@ stop:
 	@docker-compose down
 
 build:
-	@docker-compose build
+	@docker-compose -f $(COMPOSE_FILE) build
 
 devmate-log:
 	@echo "Checking if devmate_devmate-backend_1 is running..."
