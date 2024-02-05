@@ -25,6 +25,12 @@ const AddDeviceSection = ({newDevice, setNewDevice, handleAddDevice}) => {
                             onChange={(e) => setNewDevice({...newDevice, model: e.target.value})}
                             style={{marginRight: 10}}
                         />
+                        <TextField
+                            label="Info"
+                            value={newDevice.info}
+                            onChange={(e) => setNewDevice({...newDevice, info: e.target.value})}
+                            style={{marginRight: 10}}
+                        />
                         <Button variant="contained" color="primary"
                                 onClick={handleAddDevice}
                                 disabled={!newDevice.device || !newDevice.model}
