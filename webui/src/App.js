@@ -229,7 +229,7 @@ const App = () => {
     }
 
 
-    const payload = {device: newDevice.device, model: newDevice.model};
+    const payload = {device: newDevice.device, model: newDevice.model, info: newDevice.info};
     await handleApiCall(`/devices/add`, 'post', payload).then(handleSuccess).catch(handleError);
   };
 
