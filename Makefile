@@ -57,8 +57,8 @@ db-clean:
 update-cli: cli-dir-clean cli-dir
 
 run: db-dir cli-dir
-	@which docker-compose >/dev/null 2>&1 || (echo "Error: docker-compose is not installed." && exit 1)
-	@docker-compose -f $(COMPOSE_FILE) up -d
+	@which docker compose >/dev/null 2>&1 || (echo "Error: docker compose is not installed." && exit 1)
+	@docker compose -f $(COMPOSE_FILE) up -d
 	@echo "------------------------------------------"
 	@echo "Backend is running at: $(PROTO)://localhost:${DEVMATE_BACKEND_PORT}"
 	@echo "Web UI is running at: $(PROTO)://localhost:${WEBUI_PORT}"
@@ -66,10 +66,10 @@ run: db-dir cli-dir
 
 
 stop:
-	@docker-compose down
+	@docker compose down
 
 build:
-	@docker-compose -f $(COMPOSE_FILE) build
+	@docker compose -f $(COMPOSE_FILE) build
 
 devmate-log:
 	@echo "Checking if devmate_devmate-backend_1 is running..."
@@ -77,14 +77,14 @@ devmate-log:
 	@docker exec -it devmate_devmate-backend_1 tail -f /app/devmate.log
 
 clean:
-	@docker-compose down --rmi all -v
+	@docker compose down --rmi all -v
 
 distclean: clean venv-clean cli-dir-clean db-clean
 
 restart: stop run
 
 status:
-	@docker-compose ps
+	@docker compose ps
 
 certs-gen:
 	@echo "Generating SSL certificates..."
