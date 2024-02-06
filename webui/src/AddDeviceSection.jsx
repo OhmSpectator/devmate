@@ -27,9 +27,12 @@ const AddDeviceSection = ({newDevice, setNewDevice, handleAddDevice}) => {
                         />
                         <TextField
                             label="Info"
+                            multiline
+                            rows={4} // Adjust the number of rows as needed
                             value={newDevice.info}
                             onChange={(e) => setNewDevice({...newDevice, info: e.target.value})}
-                            style={{marginRight: 10}}
+                            variant="outlined" // This is optional but gives the TextField an outlined appearance
+                            style={{marginBottom: 10}} // Adjust as necessary for spacing
                         />
                         <Button variant="contained" color="primary"
                                 onClick={handleAddDevice}
