@@ -20,7 +20,7 @@ const DeviceRow = ({device, handleUsernameChange, deviceUsernames, handleReserve
     return (
         <TableRow key={device.name}>
             <TableCell>
-                {device.name}gi
+                {device.name}
                 <Tooltip
                     title={<div style={{whiteSpace: 'pre-line'}}>{device.info}</div>}
                     placement="top"
