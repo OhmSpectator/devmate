@@ -105,7 +105,7 @@ def list_devices():
 
         # Create a table object
         table = PrettyTable()
-        table.field_names = ["Name", "Model", "Status", "Reserved By", "Reserved At", "Reserved For"]
+        table.field_names = ["Name", "Model", "Info", "Status", "Reserved By", "Reserved At", "Reserved For"]
 
         for device in devices:
             status = device.get('status')
@@ -124,7 +124,8 @@ def list_devices():
                 reserved_for = humanize.naturaldelta(reserved_for) + " by now"
 
             table.add_row(
-                [device.get('name'), device.get('model'), status, reserved_by or "", reserved_at, reserved_for])
+                [device.get('name'), device.get('model'), device.get('info') or "", status, reserved_by or "", reserved_at,
+                 reserved_for])
 
         print(table)
     elif response.status_code == 204:
@@ -163,8 +164,8 @@ def release_device(device_name):
         handle_unexpected_status(response)
 
 
-def add_device(device_name, model):
-    payload = {'device': device_name, 'model': model}
+def add_device(device_name, model, info=None):
+    payload = {'device': device_name, 'model': model, 'info': info}
     response = do_api_call('post', 'devices/add', payload=payload)
     if response.status_code == 201:
         print("Device successfully added.")
@@ -251,10 +252,11 @@ def main():
     add_parser = subparsers.add_parser(
         "add",
         help="Add a new device to the management system.",
-        usage="add <device> --model"
+        usage="add <device> --model [--info]"
     )
     add_parser.add_argument("device")
     add_parser.add_argument("--model", required=True)
+    add_parser.add_argument("--info", required=False, default=None)
 
     offline_parser = subparsers.add_parser(
         "offline",
@@ -310,7 +312,7 @@ def main():
     elif args.command == "release":
         release_device(args.device)
     elif args.command == "add":
-        add_device(args.device, args.model)
+        add_device(args.device, args.model, args.info)
     elif args.command == "offline":
         set_device_offline(args.device)
     elif args.command == "online":

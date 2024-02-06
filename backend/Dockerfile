@@ -34,6 +34,12 @@ RUN pip install --no-cache-dir --user --disable-pip-version-check -r requirement
 # Copy the application into the container
 COPY --chown=$DEVMATE_USER:$DEVMATE_USER ./devmateback /app/devmateback
 
+# Copy the migration scripts into the container
+COPY --chown=$DEVMATE_USER:$DEVMATE_USER ./migrations /app/migrations
+
+# Set the ENV variables
+ENV FLASK_APP devmateback/app.py
+
 # Expose the port the app runs on
 EXPOSE 8000
 

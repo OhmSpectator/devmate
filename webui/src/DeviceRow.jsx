@@ -1,5 +1,7 @@
 import React from 'react';
 import {Box, TableCell, TableRow} from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
+import InfoIcon from '@mui/icons-material/Info';
 import 'moment-duration-format';
 
 import ReserveGroup from "./ReserveGroup";
@@ -17,7 +19,15 @@ export const calculateTimeDiff = (reservation_time) => {
 const DeviceRow = ({device, handleUsernameChange, deviceUsernames, handleReserve, handleRelease, handleOffline, handleDelete, handleOnline, showMaintenanceMode}) => {
     return (
         <TableRow key={device.name}>
-            <TableCell>{device.name}</TableCell>
+            <TableCell>
+                {device.name}gi
+                <Tooltip
+                    title={<div style={{whiteSpace: 'pre-line'}}>{device.info}</div>}
+                    placement="top"
+                >
+                    <InfoIcon style={{marginLeft: 5, cursor: 'pointer'}}/>
+                </Tooltip>
+            </TableCell>
             <TableCell>{device.model}</TableCell>
             <TableCell>
                 <Box alignItems={"center"}>

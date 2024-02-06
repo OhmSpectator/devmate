@@ -49,7 +49,7 @@ const backendPort = process.env.REACT_APP_DEVMATE_BACKEND_PORT || 8888;
 
 const App = () => {
   const [devices, setDevices] = useState([]);
-  const [newDevice, setNewDevice] = useState({device: '', model: ''});
+  const [newDevice, setNewDevice] = useState({device: '', model: '', info: ''});
   const [deviceUsernames, setDeviceUsernames] = useState({});
   const [statusMessage, setStatusMessage] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -219,7 +219,7 @@ const App = () => {
         default:
           console.warn('Unexpected response status:', response.status);
       }
-      setNewDevice({device: '', model: ''});
+      setNewDevice({device: '', model: '', info: ''});
       await handleList();
     }
 
@@ -229,7 +229,7 @@ const App = () => {
     }
 
 
-    const payload = {device: newDevice.device, model: newDevice.model};
+    const payload = {device: newDevice.device, model: newDevice.model, info: newDevice.info};
     await handleApiCall(`/devices/add`, 'post', payload).then(handleSuccess).catch(handleError);
   };
 

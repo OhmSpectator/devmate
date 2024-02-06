@@ -87,13 +87,17 @@ def add_device():
 
     device = request.json['device']
     model = request.json['model']
+    if request.json.get('info'):
+        info = request.json['info']
+    else:
+        info = None
 
     existing_device = Device.query.filter_by(name=device).first()
     if existing_device:
         logger.debug(f'Device {device} already exists')
         return jsonify({"message": "Device with this name already exists"}), HTTPStatus.CONFLICT
 
-    new_device = Device(name=device, model=model, status=Device.FREE)
+    new_device = Device(name=device, model=model, status=Device.FREE, info=info)
     db.session.add(new_device)
     db.session.commit()
     logger.info(f'Device {device} added')

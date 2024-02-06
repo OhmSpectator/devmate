@@ -4,6 +4,7 @@ from logging.handlers import RotatingFileHandler
 
 from flask import Flask, request
 from flask_cors import CORS
+from flask_migrate import Migrate
 
 from devmateback.models import db
 from devmateback.devices import devices_bp
@@ -93,6 +94,8 @@ app = create_app()
 if app is None:
     print("Failed to create the Flask app!")
     exit(1)
+
+migrate = Migrate(app, db)
 
 
 @app.before_request

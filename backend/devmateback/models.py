@@ -18,6 +18,7 @@ class Device(db.Model):
     status = db.Column(db.Enum(*STATUS_CHOICES), nullable=False, default=FREE)
     user = db.Column(db.String(50), nullable=True)
     reservation_time = db.Column(db.DateTime, nullable=True)
+    info = db.Column(db.String(100), nullable=True)
 
     def as_dict(self):
         result_dict = {}

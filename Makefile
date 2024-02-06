@@ -57,8 +57,8 @@ db-clean:
 update-cli: cli-dir-clean cli-dir
 
 run: db-dir cli-dir
-	@which docker-compose >/dev/null 2>&1 || (echo "Error: docker-compose is not installed." && exit 1)
-	@docker-compose -f $(COMPOSE_FILE) up -d
+	@which docker compose >/dev/null 2>&1 || (echo "Error: docker compose is not installed." && exit 1)
+	@docker compose -f $(COMPOSE_FILE) up -d
 	@echo "------------------------------------------"
 	@echo "Backend is running at: $(PROTO)://localhost:${DEVMATE_BACKEND_PORT}"
 	@echo "Web UI is running at: $(PROTO)://localhost:${WEBUI_PORT}"
@@ -66,25 +66,33 @@ run: db-dir cli-dir
 
 
 stop:
-	@docker-compose down
+	@docker compose down
 
 build:
-	@docker-compose -f $(COMPOSE_FILE) build
+	@docker compose -f $(COMPOSE_FILE) build
 
 devmate-log:
-	@echo "Checking if devmate_devmate-backend_1 is running..."
-	@docker ps --filter "name=devmate_devmate-backend_1" --format "{{.Names}}" | grep -q "devmate_devmate-backend_1" || (echo "Container is not running. Aborting." && exit 1)
-	@docker exec -it devmate_devmate-backend_1 tail -f /app/devmate.log
+	@echo "Checking if devmate-devmate-backend-1 is running..."
+	@docker ps --filter "name=devmate-devmate-backend-1" --format "{{.Names}}" | grep -q "devmate-devmate-backend-1" || (echo "Container is not running. Aborting." && exit 1)
+	@docker exec -it devmate-devmate-backend-1 tail -f /app/devmate.log
+
+migrate-up:
+	@echo "Running migration..."
+	@docker exec -it devmate-devmate-backend-1 flask db upgrade
+
+migrate-down:
+	@echo "Running migration..."
+	@docker exec -it devmate-devmate-backend-1 flask db downgrade
 
 clean:
-	@docker-compose down --rmi all -v
+	@docker compose down --rmi all -v
 
 distclean: clean venv-clean cli-dir-clean db-clean
 
 restart: stop run
 
 status:
-	@docker-compose ps
+	@docker compose ps
 
 certs-gen:
 	@echo "Generating SSL certificates..."
