@@ -34,6 +34,12 @@ RUN pip install --no-cache-dir --user --disable-pip-version-check -r requirement
 # Copy the application into the container
 COPY --chown=$DEVMATE_USER:$DEVMATE_USER ./devmateback /app/devmateback
 
+# Copy the migration scripts into the container
+COPY --chown=$DEVMATE_USER:$DEVMATE_USER ./migrations /app/migrations
+
+# Set the ENV variables
+ENV FLASK_APP devmateback/app.py
+
 RUN mkdir -p /app/certs/
 COPY --chown=${DEVMATE_USER}:${DEVMATE_USER} ./certs/server.cert /app/certs/server.cert
 COPY --chown=${DEVMATE_USER}:${DEVMATE_USER} ./certs/server.key /app/certs/server.key
