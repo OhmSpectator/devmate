@@ -20,7 +20,7 @@ ARG DEVMATE_BACKEND_PORT
 RUN REACT_APP_DEVMATE_BACKEND_PORT=${DEVMATE_BACKEND_PORT} npm run build
 
 # Step 2: Serve the React application from Nginx
-FROM nginx:1.25.3-alpine3.18
+FROM nginx:alpine
 
 # Copy the build output to replace the default Nginx contents
 COPY --from=build /app/build /usr/share/nginx/html
