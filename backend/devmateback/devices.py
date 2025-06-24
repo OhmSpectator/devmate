@@ -170,3 +170,27 @@ def delete_device(device):
     else:
         logger.error(f'Device {device} not found')
         return jsonify({'message': 'Device not found'}), HTTPStatus.NOT_FOUND
+
+
+@devices_bp.route('/update', methods=['POST'])
+def update_device_info():
+    """Update information field for a device."""
+    logger.debug('Updating device info')
+
+    is_valid, error_response, status_code = validate_request(request, ['device', 'info'])
+    if not is_valid:
+        logger.error('Invalid request')
+        return error_response, status_code
+
+    device_name = request.json['device']
+    info = request.json['info']
+
+    device = Device.query.filter_by(name=device_name).first()
+    if device:
+        device.info = info
+        db.session.commit()
+        logger.info(f'Device {device} info updated')
+        return jsonify({'message': 'Device info updated'}), HTTPStatus.OK
+    else:
+        logger.error(f'Device {device_name} not found')
+        return jsonify({'message': 'Device not found'}), HTTPStatus.NOT_FOUND

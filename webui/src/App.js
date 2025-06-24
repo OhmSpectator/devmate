@@ -439,6 +439,41 @@ const App = () => {
     await handleApiCall(`/devices/delete/${deviceName}`, 'delete', null).then(handleSuccess).catch(handleError);
   };
 
+  const handleUpdateInfo = async (deviceName, info) => {
+    const handleError = (error) => {
+      if (error.response) {
+        switch (error.response.status) {
+          case 404:
+            console.warn(`Device ${deviceName} does not exist.`);
+            showSnackbar(`Device ${deviceName} does not exist.`);
+            break;
+          case 400:
+            console.warn(`Bad request. Missing parameters.`);
+            break;
+          default:
+            console.error('An error occurred:', error);
+        }
+      } else {
+        console.error('An error occurred:', error);
+        handleHealth();
+      }
+    };
+
+    const handleSuccess = async (response) => {
+      switch (response.status) {
+        case 200:
+          console.log('Device info updated successfully.');
+          break;
+        default:
+          console.warn('Unexpected response status:', response.status);
+      }
+      await handleList();
+    };
+
+    const payload = {device: deviceName, info: info};
+    await handleApiCall(`/devices/update`, 'post', payload).then(handleSuccess).catch(handleError);
+  };
+
   const handleGetCLI = async () => {
     setShowHelp(true);
   }
@@ -459,6 +494,7 @@ const App = () => {
                 handleOnline={handleOnline}
                 handleOffline={handleOffline}
                 handleDelete={handleDelete}
+                handleUpdateInfo={handleUpdateInfo}
             />
             <AddDeviceSection
                 newDevice={newDevice}
