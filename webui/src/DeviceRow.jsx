@@ -16,7 +16,7 @@ export const calculateTimeDiff = (reservation_time) => {
     return duration.format("d [days] h [hrs] m [min] s [sec]");
 };
 
-const DeviceRow = ({device, handleUsernameChange, deviceUsernames, handleReserve, handleRelease, handleOffline, handleDelete, handleOnline, showMaintenanceMode}) => {
+const DeviceRow = ({device, handleUsernameChange, deviceUsernames, handleReserve, handleRelease, handleOffline, handleDelete, handleOnline, handleUpdateInfo, showMaintenanceMode}) => {
     return (
         <TableRow key={device.name}>
             <TableCell>
@@ -60,6 +60,7 @@ const DeviceRow = ({device, handleUsernameChange, deviceUsernames, handleReserve
                 handleOffline={handleOffline}
                 handleDelete={handleDelete}
                 handleOnline={handleOnline}
+                handleUpdateInfo={handleUpdateInfo}
                 showMaintenanceMode={showMaintenanceMode}/>
         </TableRow>
     )

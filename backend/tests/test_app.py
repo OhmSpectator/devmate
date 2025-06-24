@@ -253,6 +253,37 @@ class TestDeleteDevice(BaseTestCase):
         self.assertEqual(response.get_json(), {'message': 'Device not found'})
 
 
+class TestUpdateDeviceInfo(BaseTestCase):
+
+    def test_update_device_info_success(self):
+        with app.app_context():
+            device = Device(name='Device1', model='Model1', status='free', info='old')
+            db.session.add(device)
+            db.session.commit()
+
+        response = self.client.post('/devices/update', json={'device': 'Device1', 'info': 'new info'})
+        self.assertEqual(HTTPStatus.OK, response.status_code)
+        self.assertEqual(response.get_json(), {'message': 'Device info updated'})
+        with app.app_context():
+            device = Device.query.filter_by(name='Device1').first()
+            self.assertEqual(device.info, 'new info')
+
+    def test_update_device_info_not_found(self):
+        response = self.client.post('/devices/update', json={'device': 'NonExist', 'info': 'info'})
+        self.assertEqual(HTTPStatus.NOT_FOUND, response.status_code)
+        self.assertEqual(response.get_json(), {'message': 'Device not found'})
+
+    def test_update_device_info_missing_params(self):
+        response = self.client.post('/devices/update', json={'device': 'Device1'})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
+        self.assertEqual(response.get_json(), {'message': 'Missing parameters: info'})
+
+    def test_update_device_info_empty_params(self):
+        response = self.client.post('/devices/update', json={'device': '', 'info': ''})
+        self.assertEqual(HTTPStatus.BAD_REQUEST, response.status_code)
+        self.assertEqual(response.get_json(), {'message': 'Empty parameters: device, info'})
+
+
 class TestValidation(unittest.TestCase):
 
     def setUp(self):
